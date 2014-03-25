@@ -1,0 +1,17 @@
+Open Lighting Architecture UI for Raspberry Pi
+===============================================================================
+!!!  NOTE: This project is currently in-development; current build does not !!!
+!!!        necessarily reflect final features and/or interface              !!!
+
+Once completed, this user interface will provide a method by which a Raspberry
+Pi and a touchscreen may be used to configure and test an OLA network.
+
+Requirements
+-------------------------------------------------------------------------------
+-Python 2.7
+-Open Lighting Architecture (configured with --enable-python-libs)
+-Python Kivy 1.8 or greater and all dependencies (http://kivy.org/#download)
+
+Usage
+-------------------------------------------------------------------------------
+python main.py in order to start the user interface

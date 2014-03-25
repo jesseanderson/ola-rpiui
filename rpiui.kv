@@ -1,0 +1,65 @@
+#:kivy 1.8.0
+#:import KivyLexer kivy.extras.highlight.KivyLexer
+#:import Factory kivy.factory.Factory
+
+<Screen>:
+    canvas.before:
+		Color:
+			rgb: .2, .2, .2
+		Rectangle:
+			size: self.size
+
+<MainScreen>:	
+	AnchorLayout:
+        anchor_x: 'center'
+        anchor_y: 'top'
+
+<PatchingScreen>:
+	AnchorLayout:
+		Button:
+			size_hint: None, None
+			size: '200dp', '48dp'
+			text: 'Future Patching Screen'
+
+<ConsoleScreen>:	
+	AnchorLayout:
+		Button:
+			size_hint: None, None
+			size: '200dp', '48dp'
+			text: 'Future DMX Console Screen'
+
+<MonitorScreen>:	
+	AnchorLayout:
+		Button:
+			size_hint: None, None
+			size: '200dp', '48dp'
+			text: 'Future DMX Monitor Screen'
+
+<RDMSettingsScreen>:	
+	AnchorLayout:
+		Button:
+			size_hint: None, None
+			size: '200dp', '48dp'
+			text: 'Future RDM Settings Screen'
+
+<RDMTestsScreen>:	
+	AnchorLayout:
+		Button:
+			size_hint: None, None
+			size: '200dp', '48dp'
+			text: 'Future RDM Tests Screen'
+
+<ActionBar>:
+    ActionView:
+        id: av
+        ActionButton:
+            text: 'Previous screen'
+            on_release: app.go_previous_screen()
+            important: True
+        ActionPrevious:
+            disabled: True
+            with_previous: False
+        ActionButton:
+            text: 'Next screen'
+            on_release: app.go_next_screen()
+            important: True
