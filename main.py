@@ -69,6 +69,9 @@ class RPiUI(App):
   def on_resume(self):
     pass
 
+  def set_ola_status(self, text_string):
+    self.devsets.ids.olad_status.text = text_string
+
   def go_previous_screen(self):
     self.index = (self.index - 1) % len(self.available_screens)
     SlideTransition.direction = 'right'
@@ -80,13 +83,6 @@ class RPiUI(App):
     SlideTransition.direction = 'left'
     self.sm.current = self.screen_names[self.index]
     self.current_title = self.screen_names[self.index]
-
-  def set_ola_status(self, text_string):
-    self.status = Label(text=text_string,text_size=(None,30))
-    self.devsets.clear_widgets()
-    self.devsets.anchor_x='center'
-    self.devsets.anchor_y='top'
-    self.devsets.add_widget(self.status)
 
   def _update_clock(self, dt):
     self.time = time()
