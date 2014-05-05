@@ -72,6 +72,12 @@ class RPiUI(App):
   def set_ola_status(self, text_string):
     self.devsets.ids.olad_status.text = text_string
 
+  def display_universes(self, universe_list):
+    def uni_to_string(a,b):
+        return a + '\n' + b
+    uni_string = reduce(uni_to_string, universe_list, '')
+    self.devsets.ids.universes.text = uni_string
+
   def go_previous_screen(self):
     self.index = (self.index - 1) % len(self.available_screens)
     SlideTransition.direction = 'right'
