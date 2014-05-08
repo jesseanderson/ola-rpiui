@@ -10,13 +10,19 @@
 			size: self.size
 
 <MainScreen>:	
-	AnchorLayout:
+    AnchorLayout:
         anchor_x: 'center'
         anchor_y: 'top'
         Label:
             id: olad_status
             size_hint: None, None
-            height: 40
+            size: '200dp', '48dp'
+        Button:
+            id: fetch_universes
+            size: '200dp', '48dp'
+            size_hint: None, None
+            text: 'Fetch Universes'
+            on_release: app.display_universes()
         Label:
             id: universes
             size_hint: None,None

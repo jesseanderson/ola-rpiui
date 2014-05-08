@@ -40,6 +40,7 @@ class RPiUI(App):
   def build(self):
     self.title = 'Open Lighting Architecture'
     self.ola_listener = OLAListener()
+    self.ola_listener.start()
     self.layout = BoxLayout(orientation='vertical')
     #ActionBar creation and layout placing
     self.ab = ActionBar()
@@ -58,9 +59,9 @@ class RPiUI(App):
       'DMX Console', 'RDM Settings', 'RDM Tests']
     self.screen_names = self.available_screens
     self.go_next_screen()
+    
 
     Clock.schedule_interval(self._update_clock, 1 / 60.)
-    Clock.schedule_interval(self.olad_listen, 1.)
     return self.layout
     
   def on_pause(self):
@@ -72,11 +73,17 @@ class RPiUI(App):
   def set_ola_status(self, text_string):
     self.devsets.ids.olad_status.text = text_string
 
-  def display_universes(self, universe_list):
+  def display_universes(self):
+    self.ola_listener.pull_universes(self.display_universes_callback)
+    print "Universe Request Completed"
+
+  def display_universes_callback(self, status, universes):
+    universe_names = [uni.name for uni in universes]
     def uni_to_string(a,b):
         return a + '\n' + b
-    uni_string = reduce(uni_to_string, universe_list, '')
+    uni_string = reduce(uni_to_string, universe_names, '')
     self.devsets.ids.universes.text = uni_string
+    print "Universes Displayed"
 
   def go_previous_screen(self):
     self.index = (self.index - 1) % len(self.available_screens)

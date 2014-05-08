@@ -1,42 +1,37 @@
 import sys
-from ola.ClientWrapper import ClientWrapper, OLADNotRunningException
+import threading
+from ola.ClientWrapper import ClientWrapper, SelectServer
+from ola.OlaClient import OlaClient, OLADNotRunningException
 
-class OLAListener():
+class OLAListener(threading.Thread):
 
   def __init__(self):
-    #Temporary hack to get OLA status to display on startup
+    super(OLAListener,self).__init__()
+    self.daemon = True
     try:
-      self.wrapper = ClientWrapper()
-      self.client = self.wrapper.Client()
-      self.ola_running = False
+      self.client = OlaClient()
+      self.ola_running = True
     except OLADNotRunningException:
-      self.ola_running = True 
+      self.ola_running = False 
+
+  def run(self):
+    try:
+      self.selectserver = SelectServer()
+      self.selectserver.AddReadDescriptor(self.client.GetSocket(),
+                                          self.client.SocketReady)
+      self.selectserver.Run()
+    except OLADNotRunningException:
+      self.ola_running = False
 
   def ola_quit(self, UI):
-    UI.set_ola_status('OLAD is not Running')
+    UI.set_ola_status('OLAD is Not Running')
     self.ola_running = False
 
   def ola_start(self, UI):
     UI.set_ola_status('OLAD is Running')
     self.ola_running = True
 
-  def pull_universes(self, UI):
-    def pull_universes_callback(status, universes):
-      universe_names = [uni.name for uni in universes]
-      UI.display_universes(universe_names)
-      self.wrapper.Stop()
-    self.client.FetchUniverses(pull_universes_callback)
+  def pull_universes(self, callback):
+    self.selectserver.Execute(lambda:self.client.FetchUniverses(callback))
 
 
-  def listen(self, UI):
-    #TODO: better OLAD detection
-    try:
-      self.wrapper = ClientWrapper()
-      self.client = self.wrapper.Client()
-      if not self.ola_running:
-        self.ola_start(UI)
-      self.pull_universes(UI)
-      self.wrapper.Run()
-    except OLADNotRunningException:
-      if self.ola_running:
-        self.ola_quit(UI)
