@@ -5,9 +5,10 @@ from ola.OlaClient import OlaClient, OLADNotRunningException
 
 class OLAListener(threading.Thread):
 
-  def __init__(self):
+  def __init__(self, ui_queue):
     super(OLAListener,self).__init__()
-    self.daemon = True
+    self.ui_queue = ui_queue
+    self.daemon = True #Allows python to terminate upon closing UI
     try:
       self.client = OlaClient()
       self.ola_running = True
@@ -32,6 +33,12 @@ class OLAListener(threading.Thread):
     self.ola_running = True
 
   def pull_universes(self, callback):
-    self.selectserver.Execute(lambda:self.client.FetchUniverses(callback))
+    ''' Executes the get universes requestin the selectserver with a callback 
+        that will put the universes in the UI queue
+    ''' 
+    self.selectserver.Execute(
+      lambda:self.client.FetchUniverses(self.universes_queue_callback(callback)))
 
+  def universes_queue_callback(self,callback):
+    return lambda status,universes: self.ui_queue.put([callback,status,universes])
 

@@ -2,6 +2,7 @@ import kivy
 kivy.require('1.8.0')
 
 from time import time
+from Queue import Queue
 from kivy.app import App
 from kivy.uix.label import Label
 from kivy.lang import Builder
@@ -39,7 +40,8 @@ class RPiUI(App):
 
   def build(self):
     self.title = 'Open Lighting Architecture'
-    self.ola_listener = OLAListener()
+    self.ui_queue = Queue()
+    self.ola_listener = OLAListener(self.ui_queue)
     self.ola_listener.start()
     self.layout = BoxLayout(orientation='vertical')
     #ActionBar creation and layout placing
@@ -60,10 +62,10 @@ class RPiUI(App):
     self.screen_names = self.available_screens
     self.go_next_screen()
     
-
+    Clock.schedule_interval(self.display_tasks, 1 / 20)
     Clock.schedule_interval(self._update_clock, 1 / 60.)
     return self.layout
-    
+
   def on_pause(self):
     return True
 
@@ -72,6 +74,13 @@ class RPiUI(App):
 
   def set_ola_status(self, text_string):
     self.devsets.ids.olad_status.text = text_string
+
+  def display_tasks(self, dt):
+    while not self.ui_queue.empty():
+      item = self.ui_queue.get()
+      func = item[0]
+      args = item[1:]
+      func(*args)
 
   def display_universes(self):
     self.ola_listener.pull_universes(self.display_universes_callback)
