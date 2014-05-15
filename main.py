@@ -65,7 +65,8 @@ class RPiUI(App):
       'DMX Console', 'RDM Settings', 'RDM Tests']
     self.screen_names = self.available_screens
     self.go_next_screen()
-    Clock.schedule_interval(self.display_tasks, self.EVENT_POLL_INTERVAL)
+    Clock.schedule_interval(lambda dt: self.display_tasks(), 
+                            self.EVENT_POLL_INTERVAL)
     Clock.schedule_interval(self._update_clock, 1 / 60.)
     return self.layout
 
@@ -78,19 +79,16 @@ class RPiUI(App):
   def set_ola_status(self, text_string):
     self.devsets.ids.olad_status.text = text_string
 
-  def display_tasks(self, dt):
+  def display_tasks(self):
     """Polls for events that need to update the UI, 
        then updates the UI accordingly.
-
-       Args:
-         dt: time since last scheudled call
     """
     try:
       item = self.ui_queue.get(False)
       func = item[0]
       args = item[1:]
       func(*args)
-      self.display_tasks(0)
+      self.display_tasks()
     except Empty:
       pass
 
