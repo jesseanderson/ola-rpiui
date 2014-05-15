@@ -2,7 +2,7 @@
 import kivy
 kivy.require('1.8.0')
 from time import time
-from Queue import Queue
+from Queue import Queue, Empty
 from kivy.app import App
 from kivy.uix.label import Label
 from kivy.lang import Builder
@@ -85,11 +85,14 @@ class RPiUI(App):
        Args:
          dt: time since last scheudled call
     """
-    while not self.ui_queue.empty():
-      item = self.ui_queue.get()
+    try:
+      item = self.ui_queue.get(False)
       func = item[0]
       args = item[1:]
       func(*args)
+      self.display_tasks(0)
+    except Empty:
+      pass
 
   def display_universes(self):
     """Makes a call to fetch the active universes; then put them in the
