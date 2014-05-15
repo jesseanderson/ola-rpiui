@@ -26,7 +26,6 @@ class PatchingScreen(Screen):
 class ConsoleScreen(Screen):
   pass
 
-
 class RDMSettingsScreen(Screen):
   pass
 
@@ -34,6 +33,7 @@ class RDMTestsScreen(Screen):
   pass
 
 class RPiUI(App):
+  """Class for drawing and handling the Kivy application itself."""
   EVENT_POLL_INTERVAL = 1 / 20
   index = NumericProperty(-1)
   time = NumericProperty(0)
@@ -41,6 +41,7 @@ class RPiUI(App):
   screen_names = ListProperty([])
 
   def build(self):
+    """Initializes the user interface and starts timed events."""
     #TODO: Reorganize and consolidate; make necessary helper functions
     self.title = 'Open Lighting Architecture'
     self.ui_queue = Queue()
@@ -78,6 +79,12 @@ class RPiUI(App):
     self.devsets.ids.olad_status.text = text_string
 
   def display_tasks(self, dt):
+    """Polls for events that need to update the UI, 
+       then updates the UI accordingly.
+
+       Args:
+         dt: time since last scheudled call
+    """
     while not self.ui_queue.empty():
       item = self.ui_queue.get()
       func = item[0]
@@ -85,9 +92,19 @@ class RPiUI(App):
       func(*args)
 
   def display_universes(self):
+    """Makes a call to fetch the active universes; then put them in the
+       UI queue to be handled by display_universes_callback.
+    """
     self.ola_listener.pull_universes(self.display_universes_callback)
 
   def display_universes_callback(self, status, universes):
+    """Updates the user interface with the active universes.
+
+       Args:
+         status: RequestStatus object indicating whether the request
+                 was successful
+         universes: A list of Universe objects
+    """
     universe_names = [uni.name for uni in universes]
     def uni_to_string(a,b):
         return '{}\n{}'.format(a,b)
@@ -95,12 +112,14 @@ class RPiUI(App):
     self.devsets.ids.universes.text = uni_string
 
   def go_previous_screen(self):
+    """Changes the UI to view the screen to the left of the current one"""
     self.index = (self.index - 1) % len(self.available_screens)
     SlideTransition.direction = 'right'
     self.sm.current = self.screen_names[self.index]
     self.current_title = self.screen_names[self.index]
 
   def go_next_screen(self):
+    """Changes the UI to view the screen to the right of the current one"""
     self.index = (self.index + 1) % len(self.available_screens)
     SlideTransition.direction = 'left'
     self.sm.current = self.screen_names[self.index]

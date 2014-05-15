@@ -4,8 +4,14 @@ from ola.ClientWrapper import ClientWrapper, SelectServer
 from ola.OlaClient import OlaClient, OLADNotRunningException
 
 class OLAListener(threading.Thread):
+  """Makes all requested calls to OLA in its own thread."""
 
   def __init__(self, ui_queue):
+    """Initializes OLA objects; determines if OLAD is running upon start.
+
+       Args:
+         ui_queue: A Queue where UI events are held.
+    """
     super(OLAListener,self).__init__()
     self.ui_queue = ui_queue
     self.daemon = True #Allows python to terminate upon closing UI
@@ -16,6 +22,7 @@ class OLAListener(threading.Thread):
       self.ola_running = False 
 
   def run(self):
+    """Initializes and runs an OLA SelectServer"""
     try:
       self.selectserver = SelectServer()
       self.selectserver.AddReadDescriptor(self.client.GetSocket(),
@@ -33,12 +40,23 @@ class OLAListener(threading.Thread):
     self.ola_running = True
 
   def pull_universes(self, callback):
-    ''' Executes the get universes requestin the selectserver with a callback 
-        that will put the universes in the UI queue
-    ''' 
+    """Executes the get universes request in the selectserver with a callback 
+       that will put the universes in the UI queue
+
+        Args:
+          callback: The UI callback that will be placed on the 
+                    UI queue with the universes
+    """
     self.selectserver.Execute(
       lambda:self.client.FetchUniverses(self.universes_queue_callback(callback)))
 
   def universes_queue_callback(self,callback):
+    """Creates an appropriate callback for client.FetchUniverses that
+       will put the OLA response directly into the UI queue
+
+       Args:
+         callback: The UI callback that will be places on the
+                   UI queue with the universes
+    """
     return lambda status,universes: self.ui_queue.put([callback,status,universes])
 
