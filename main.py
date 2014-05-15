@@ -1,6 +1,6 @@
+#!/usr/bin/python
 import kivy
 kivy.require('1.8.0')
-
 from time import time
 from Queue import Queue
 from kivy.app import App
@@ -16,6 +16,7 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 from olalistener import OLAListener
 
+
 class MainScreen(Screen):
   pass
 
@@ -25,6 +26,7 @@ class PatchingScreen(Screen):
 class ConsoleScreen(Screen):
   pass
 
+
 class RDMSettingsScreen(Screen):
   pass
 
@@ -32,13 +34,14 @@ class RDMTestsScreen(Screen):
   pass
 
 class RPiUI(App):
-  
+  EVENT_POLL_INTERVAL = 1 / 20
   index = NumericProperty(-1)
   time = NumericProperty(0)
   current_title = StringProperty()
   screen_names = ListProperty([])
 
   def build(self):
+    #TODO: Reorganize and consolidate; make necessary helper functions
     self.title = 'Open Lighting Architecture'
     self.ui_queue = Queue()
     self.ola_listener = OLAListener(self.ui_queue)
@@ -61,8 +64,7 @@ class RPiUI(App):
       'DMX Console', 'RDM Settings', 'RDM Tests']
     self.screen_names = self.available_screens
     self.go_next_screen()
-    
-    Clock.schedule_interval(self.display_tasks, 1 / 20)
+    Clock.schedule_interval(self.display_tasks, self.EVENT_POLL_INTERVAL)
     Clock.schedule_interval(self._update_clock, 1 / 60.)
     return self.layout
 
@@ -84,15 +86,13 @@ class RPiUI(App):
 
   def display_universes(self):
     self.ola_listener.pull_universes(self.display_universes_callback)
-    print "Universe Request Completed"
 
   def display_universes_callback(self, status, universes):
     universe_names = [uni.name for uni in universes]
     def uni_to_string(a,b):
-        return a + '\n' + b
+        return '{}\n{}'.format(a,b)
     uni_string = reduce(uni_to_string, universe_names, '')
     self.devsets.ids.universes.text = uni_string
-    print "Universes Displayed"
 
   def go_previous_screen(self):
     self.index = (self.index - 1) % len(self.available_screens)
