@@ -3,6 +3,21 @@ import threading
 from ola.ClientWrapper import ClientWrapper, SelectServer
 from ola.OlaClient import OlaClient, OLADNotRunningException
 
+class UIEvent(object):
+  """Describes events that the UI needs to execute"""
+
+  def __init__(self, function, args):
+    """Args:
+         function: the function that will update the UI appropriately
+         args: a list of the arguments for that function
+    """
+    self.function = function
+    self.args = args
+
+  def run(self):
+    """Executes the UI-level event"""
+    self.function(*self.args)
+
 class OLAListener(threading.Thread):
   """Makes all requested calls to OLA in its own thread."""
 
@@ -58,5 +73,7 @@ class OLAListener(threading.Thread):
          callback: The UI callback that will be places on the
                    UI queue with the universes
     """
-    return lambda status,universes: self.ui_queue.put([callback,status,universes])
+    def universes_queue_event(status,universes):
+      self.ui_queue.put(UIEvent(callback,[status,universes]))
+    return universes_queue_event
 

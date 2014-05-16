@@ -14,7 +14,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.actionbar import ActionBar
 from kivy.uix.button import Button
 from kivy.uix.label import Label
-from olalistener import OLAListener
+from olalistener import OLAListener, UIEvent
 
 
 class MainScreen(Screen):
@@ -65,7 +65,7 @@ class RPiUI(App):
       'DMX Console', 'RDM Settings', 'RDM Tests']
     self.screen_names = self.available_screens
     self.go_next_screen()
-    Clock.schedule_interval(lambda dt: self.display_tasks(), 
+    Clock.schedule_interval(lambda dt: self.display_tasks(),
                             self.EVENT_POLL_INTERVAL)
     Clock.schedule_interval(self._update_clock, 1 / 60.)
     return self.layout
@@ -84,10 +84,8 @@ class RPiUI(App):
        then updates the UI accordingly.
     """
     try:
-      item = self.ui_queue.get(False)
-      func = item[0]
-      args = item[1:]
-      func(*args)
+      event = self.ui_queue.get(False)
+      event.run()
       self.display_tasks()
     except Empty:
       pass
