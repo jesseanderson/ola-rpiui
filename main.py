@@ -34,6 +34,7 @@ class RDMTestsScreen(Screen):
 class RPiUI(App):
   """Class for drawing and handling the Kivy application itself."""
   EVENT_POLL_INTERVAL = 1 / 20
+  UNIVERSE_POLL_INTERVAL = 1 / 10
   index = NumericProperty(-1)
   time = NumericProperty(0)
   current_title = StringProperty()
@@ -80,13 +81,15 @@ class RPiUI(App):
   def start_ola(self):
     """Executed when OLAD starts, enables proper UI actions"""
     self.devsets.ids.olad_status.text = "OLAD is Running"
-    self.devsets.ids.fetch_universes.disabled = False
+    Clock.schedule_interval(self.display_universes,
+                            self.UNIVERSE_POLL_INTERVAL)
+    self.devsets.ids.universes.disabled = False
 
   def stop_ola(self):
-    """Eecuted when OLAD stops, disables proper UI actions"""
+    """Executed when OLAD stops, disables proper UI actions"""
     self.devsets.ids.olad_status.text = "OLAD is Stopped"
-    self.devsets.ids.universes.text = ""
-    self.devsets.ids.fetch_universes.disabled = True
+    Clock.unschedule(self.display_universes)
+    self.devsets.ids.universes.disabled = True
 
   def display_tasks(self):
     """Polls for events that need to update the UI, 
@@ -99,9 +102,12 @@ class RPiUI(App):
     except Empty:
       pass
 
-  def display_universes(self):
+  def display_universes(self, dt):
     """Makes a call to fetch the active universes; then put them in the
        UI queue to be handled by display_universes_callback.
+
+       Args:
+         dt: time since last call
     """
     self.ola_listener.pull_universes(self.display_universes_callback)
 
