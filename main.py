@@ -16,7 +16,6 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 from olalistener import OLAListener, UIEvent
 
-
 class MainScreen(Screen):
   pass
 
@@ -45,7 +44,9 @@ class RPiUI(App):
     #TODO: Reorganize and consolidate; make necessary helper functions
     self.title = 'Open Lighting Architecture'
     self.ui_queue = Queue()
-    self.ola_listener = OLAListener(self.ui_queue)
+    self.ola_listener = OLAListener(self.ui_queue,
+                                    self.start_ola,
+                                    self.stop_ola)
     self.ola_listener.start()
     self.layout = BoxLayout(orientation='vertical')
     #ActionBar creation and layout placing
@@ -76,8 +77,16 @@ class RPiUI(App):
   def on_resume(self):
     pass
 
-  def set_ola_status(self, text_string):
-    self.devsets.ids.olad_status.text = text_string
+  def start_ola(self):
+    """Executed when OLAD starts, enables proper UI actions"""
+    self.devsets.ids.olad_status.text = "OLAD is Running"
+    self.devsets.ids.fetch_universes.disabled = False
+
+  def stop_ola(self):
+    """Eecuted when OLAD stops, disables proper UI actions"""
+    self.devsets.ids.olad_status.text = "OLAD is Stopped"
+    self.devsets.ids.universes.text = ""
+    self.devsets.ids.fetch_universes.disabled = True
 
   def display_tasks(self):
     """Polls for events that need to update the UI, 
