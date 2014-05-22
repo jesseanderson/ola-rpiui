@@ -14,6 +14,8 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.actionbar import ActionBar
 from kivy.uix.button import Button
 from kivy.uix.label import Label
+from kivy.adapters.listadapter import ListAdapter
+from kivy.uix.listview import ListView, ListItemButton
 from olalistener import OLAListener, UIEvent
 
 class MainScreen(Screen):
@@ -56,6 +58,11 @@ class RPiUI(App):
     #Screen creation and layout placing
     self.sm = ScreenManager(transition=SlideTransition())
     self.devsets = MainScreen(name='Device Settings')
+    list_adapter = ListAdapter(data=[],
+                               selection_mode='single',
+                               allow_empty_selection=False,
+                               cls=ListItemButton)
+    self.devsets.ids.universe_list_view.adapter = list_adapter
     self.sm.add_widget(self.devsets)
     self.sm.add_widget(PatchingScreen(name='Device Patching'))
     self.sm.add_widget(ConsoleScreen(name='DMX Console'))
@@ -83,13 +90,13 @@ class RPiUI(App):
     self.devsets.ids.olad_status.text = "OLAD is Running"
     Clock.schedule_interval(self.display_universes,
                             self.UNIVERSE_POLL_INTERVAL)
-    self.devsets.ids.universes.disabled = False
+    self.devsets.ids.universe_list_view.disabled = False
 
   def stop_ola(self):
     """Executed when OLAD stops, disables proper UI actions"""
     self.devsets.ids.olad_status.text = "OLAD is Stopped"
     Clock.unschedule(self.display_universes)
-    self.devsets.ids.universes.disabled = True
+    self.devsets.ids.universe_list_view.disabled = True
 
   def display_tasks(self):
     """Polls for events that need to update the UI, 
@@ -120,10 +127,8 @@ class RPiUI(App):
          universes: A list of Universe objects
     """
     universe_names = [uni.name for uni in universes]
-    def uni_to_string(a,b):
-        return '{}\n{}'.format(a,b)
-    uni_string = reduce(uni_to_string, universe_names, '')
-    self.devsets.ids.universes.text = uni_string
+    self.devsets.ids.universe_list_view.adapter.data = universe_names
+    self.devsets.ids.universe_list_view.populate()
 
   def go_previous_screen(self):
     """Changes the UI to view the screen to the left of the current one"""

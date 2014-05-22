@@ -11,8 +11,9 @@
 
 <MainScreen>:	
     GridLayout:
+        id: settings
         cols: 1
-        rows: 3
+        rows: 5
         Label: 
             id: olad_status
             size_hint: None, None
@@ -21,9 +22,9 @@
             text: 'Active Universes:'
             size_hint: None, None
             size: '200dp', '48dp'
-        Label:
-            id: universes
-            size_hint: None,None
+        ListView:
+            id: universe_list_view
+            size: '200dp', '150dp'
 
 <PatchingScreen>:
 	AnchorLayout:
