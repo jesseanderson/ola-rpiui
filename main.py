@@ -19,7 +19,22 @@ from kivy.uix.listview import ListView, ListItemButton
 from olalistener import OLAListener, UIEvent
 
 class MainScreen(Screen):
-  pass
+  """The settings screen that the app opens to"""
+
+  def __init__(self, onchange_callback, **kwargs):
+    """Initializes the listview that contains the universe selection.
+
+       Args:
+         onchange_callback: the callback upon a selection change 
+                            in the main listview
+    """
+    super(MainScreen, self).__init__(**kwargs)
+    list_adapter = ListAdapter(data=[],
+                               selection_mode='single',
+                               allow_empty_selection=False,
+                               cls=ListItemButton)
+    list_adapter.bind(on_selection_change=onchange_callback)
+    self.ids.universe_list_view.adapter = list_adapter
 
 class PatchingScreen(Screen):
   pass
@@ -57,12 +72,8 @@ class RPiUI(App):
     self.layout.add_widget(self.ab)
     #Screen creation and layout placing
     self.sm = ScreenManager(transition=SlideTransition())
-    self.devsets = MainScreen(name='Device Settings')
-    list_adapter = ListAdapter(data=[],
-                               selection_mode='single',
-                               allow_empty_selection=False,
-                               cls=ListItemButton)
-    self.devsets.ids.universe_list_view.adapter = list_adapter
+    self.devsets = MainScreen(self.change_selected_universe,
+                              name='Device Settings')
     self.sm.add_widget(self.devsets)
     self.sm.add_widget(PatchingScreen(name='Device Patching'))
     self.sm.add_widget(ConsoleScreen(name='DMX Console'))
@@ -129,6 +140,18 @@ class RPiUI(App):
     universe_names = [uni.name for uni in universes]
     self.devsets.ids.universe_list_view.adapter.data = universe_names
     self.devsets.ids.universe_list_view.populate()
+
+  def change_selected_universe(self, adapter):
+    """This will make the appropriate changes once a new universe is selected;
+       for now it justs holds prints for visualization.
+
+       Args:
+         adapter: the adapter passed upon a listadapter on_selection_change call
+    """
+    if len(adapter.selection) == 0:
+      print "No Universe Selected"
+    else:
+      print adapter.selection[0].text
 
   def go_previous_screen(self):
     """Changes the UI to view the screen to the left of the current one"""
