@@ -29,7 +29,12 @@ class MainScreen(Screen):
                             in the main listview
     """
     super(MainScreen, self).__init__(**kwargs)
+    universe_converter = \
+      lambda row_index, selectable: {'text': selectable.name,
+                                     'size_hint_y': None,
+                                     'height': 25}
     list_adapter = ListAdapter(data=[],
+                               args_converter=universe_converter,
                                selection_mode='single',
                                allow_empty_selection=False,
                                cls=ListItemButton)
@@ -67,6 +72,7 @@ class RPiUI(App):
                                     self.stop_ola)
     self.ola_listener.start()
     self.layout = BoxLayout(orientation='vertical')
+    self.selected_universe = None
     #ActionBar creation and layout placing
     self.ab = ActionBar()
     self.layout.add_widget(self.ab)
@@ -137,21 +143,19 @@ class RPiUI(App):
                  was successful
          universes: A list of Universe objects
     """
-    universe_names = [uni.name for uni in universes]
-    self.devsets.ids.universe_list_view.adapter.data = universe_names
+    self.devsets.ids.universe_list_view.adapter.data = universes
     self.devsets.ids.universe_list_view.populate()
 
   def change_selected_universe(self, adapter):
-    """This will make the appropriate changes once a new universe is selected;
-       for now it justs holds prints for visualization.
+    """Changes the UI-level selected universe.
 
        Args:
          adapter: the adapter passed upon a listadapter on_selection_change call
     """
     if len(adapter.selection) == 0:
-      print "No Universe Selected"
+      self.selected_universe = None
     else:
-      print adapter.selection[0].text
+      self.selected_universe = adapter.data[adapter.selection[0].index]
 
   def go_previous_screen(self):
     """Changes the UI to view the screen to the left of the current one"""
