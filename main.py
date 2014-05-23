@@ -14,9 +14,18 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.actionbar import ActionBar
 from kivy.uix.button import Button
 from kivy.uix.label import Label
+from kivy.uix.popup import Popup
 from kivy.adapters.listadapter import ListAdapter
 from kivy.uix.listview import ListView, ListItemButton
 from olalistener import OLAListener, UIEvent
+
+class PatchingPopup(Popup):
+  """The popup that handles patching of new universes"""
+
+  def __init__(self, **kwargs):
+    """Initializes a listview for port selection"""
+    super(PatchingPopup, self).__init__(**kwargs)
+    #TODO: Initialize a listview for port selection
 
 class MainScreen(Screen):
   """The settings screen that the app opens to"""
@@ -156,6 +165,15 @@ class RPiUI(App):
       self.selected_universe = None
     else:
       self.selected_universe = adapter.data[adapter.selection[0].index]
+
+  def patch_popup(self):
+    """Opens the universe patching interface"""
+    popup = PatchingPopup()
+    popup.open()
+
+  def patch_universe(self):
+    """TODO: finish writing this method"""
+    pass
 
   def go_previous_screen(self):
     """Changes the UI to view the screen to the left of the current one"""
