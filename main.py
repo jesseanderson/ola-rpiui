@@ -76,10 +76,6 @@ class RPiUI(App):
     #TODO: Reorganize and consolidate; make necessary helper functions
     self.title = 'Open Lighting Architecture'
     self.ui_queue = Queue()
-    self.ola_listener = OLAListener(self.ui_queue,
-                                    self.start_ola,
-                                    self.stop_ola)
-    self.ola_listener.start()
     self.layout = BoxLayout(orientation='vertical')
     self.selected_universe = None
     #ActionBar creation and layout placing
@@ -105,10 +101,22 @@ class RPiUI(App):
     Clock.schedule_interval(self._update_clock, 1 / 60.)
     return self.layout
 
+  def on_start(self):
+    """Executed after build()"""
+    self.ola_listener = OLAListener(self.ui_queue,
+                                    self.start_ola,
+                                    self.stop_ola)
+    self.ola_listener.start()
+
+  def on_stop(self):
+    pass
+
   def on_pause(self):
-    return True
+    """Pausing is not allowed; the application will close instead"""
+    return False
 
   def on_resume(self):
+    """Because pausing is not allowed, nothing to do here"""
     pass
 
   def start_ola(self):

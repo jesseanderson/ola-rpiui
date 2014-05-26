@@ -34,7 +34,7 @@ class OLAListener(threading.Thread):
     self.ui_queue = ui_queue
     self.start_event = UIEvent(on_start)
     self.stop_event = UIEvent(on_stop)
-    self.daemon = True #Allows python to terminate upon closing UI
+    self.daemon = True #Thread quits when main thread quits
 
   def run(self):
     """Initializes and runs an OLA SelectServer"""
