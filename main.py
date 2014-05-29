@@ -94,6 +94,9 @@ class MainScreen(Screen):
     list_adapter.bind(on_selection_change=onchange_callback)
     self.ids.universe_list_view.adapter = list_adapter
 
+class InfoPopup(Popup):
+  pass
+
 class PatchingScreen(Screen):
   pass
 
@@ -227,18 +230,43 @@ class RPiUI(App):
     """On the UI button press, closes the patching popup
        and makes the patch.
     """
-    #TODO: Invalid input and other error handling
     if self.patching_popup:
-      universe_id = int(self.patching_popup.ids.universe_id.text)
+      try:
+        universe_id = int(self.patching_popup.ids.universe_id.text)
+      except ValueError:
+        info_popup = InfoPopup()
+        info_popup.title = 'ERROR'
+        info_popup.ids.info.text = ("Invalid Universe ID\n"
+                                    "The universe ID must be an integer\n"
+                                    "between 0 and 4294967295")
+        info_popup.open()
+        return
       universe_name = self.patching_popup.ids.universe_name.text
       for selection in self.patching_popup.ids.device_list.adapter.selection:
         data = self.patching_popup.ids.device_list.adapter.data[selection.index]
-        print data[0]
-        print data[2]
-        print data[4]
         self.ola_listener.patch(data[0], data[2], data[4],
-                                universe_id, universe_name, None)
+                                universe_id, universe_name,
+                                self.patch_universe_callback)
+
+  def patch_universe_callback(self, status):
+    """Displays a success or error popup upon completion of the OLA patching
+
+      Args:
+        status: RequestStatus object indicating whether the patch was successful
+    """
+    if status.Succeeded():
+      info_popup = InfoPopup()
+      info_popup.title = 'Success!'
+      info_popup.ids.info.text = 'Patch completed successfully!'
+      info_popup.open()
       self.patching_popup.dismiss()
+    else:
+      info_popup = InfoPopup()
+      info_popup.title = 'ERROR'
+      info_popup.ids.info.text = ("Patch Failed!\n"
+                                  "Please check your ID and name\n"
+                                  "and try again.")
+      info_popup.open()
 
   def go_previous_screen(self):
     """Changes the UI to view the screen to the left of the current one"""

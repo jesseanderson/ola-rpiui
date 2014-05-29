@@ -54,6 +54,27 @@
                 height: 50
                 width: 200
                 on_press: app.patch_universe()
+
+<InfoPopup>:
+    size_hint: None, None
+    height: 200
+    width: 250
+    title: 'INFO'
+    GridLayout:
+        rows: 2
+        cols: 1
+        size_hint: 1, 1
+        Label: 
+            id: info
+            size_hint: 1, 1
+            halign: 'center'
+        Button:
+            size_hint: None, None
+            width: 225
+            height: 25
+            text: 'Close'
+            on_press: root.dismiss()
+
 <Screen>:
     canvas.before:
 		Color:
