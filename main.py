@@ -220,12 +220,25 @@ class RPiUI(App):
 
   def patch_popup(self):
     """Opens the universe patching interface"""
-    popup = PatchingPopup(self.ola_listener)
-    popup.open()
+    self.patching_popup = PatchingPopup(self.ola_listener)
+    self.patching_popup.open()
 
   def patch_universe(self):
-    """TODO: finish writing this method"""
-    pass
+    """On the UI button press, closes the patching popup
+       and makes the patch.
+    """
+    #TODO: Invalid input and other error handling
+    if self.patching_popup:
+      universe_id = int(self.patching_popup.ids.universe_id.text)
+      universe_name = self.patching_popup.ids.universe_name.text
+      for selection in self.patching_popup.ids.device_list.adapter.selection:
+        data = self.patching_popup.ids.device_list.adapter.data[selection.index]
+        print data[0]
+        print data[2]
+        print data[4]
+        self.ola_listener.patch(data[0], data[2], data[4],
+                                universe_id, universe_name, None)
+      self.patching_popup.dismiss()
 
   def go_previous_screen(self):
     """Changes the UI to view the screen to the left of the current one"""

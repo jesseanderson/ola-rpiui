@@ -16,8 +16,9 @@ class UIEvent(object):
     self.args = args
 
   def run(self):
-    """Executes the UI-level event"""
-    self.function(*self.args)
+    """Executes the UI-level event if the function is not None"""
+    if self.function:
+      self.function(*self.args)
 
 class OLAListener(threading.Thread):
   """Makes all requested calls to OLA in its own thread."""
@@ -106,3 +107,29 @@ class OLAListener(threading.Thread):
     def devices_queue_event(status,devices):
       self.ui_queue.put(UIEvent(callback,[status,devices]))
     return devices_queue_event
+
+  def patch(self, device_alias, port, is_output, universe_id, 
+            universe_name, callback):
+    """Patch a port to a universe.
+
+       Args:
+         device_alias: the alias of the device
+         port: the id of the port to patch to 
+         is_output: select the input or output port
+         universe_id: the universe id to patch
+         universe_name: the name for this universe
+         callback: The function to call once complete, takes one argument, a
+           RequestStatus object.
+    """
+    self.selectserver.Execute(
+      lambda:self.client.PatchPort(device_alias, port, is_output,
+                                   self.client.PATCH, universe_id, 
+                                   self.patch_callback(callback)))
+    self.selectserver.Execute(
+      lambda:self.client.SetUniverseName(universe_id, universe_name))
+
+  def patch_callback(self, callback):
+    """Creates an appropriate callback for client.PatchPort that
+       will put the OLA response directly onto the UI queue
+    """
+    return lambda status:self.ui_queue.put(UIEvent(callback,[status]))
