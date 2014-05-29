@@ -83,3 +83,26 @@ class OLAListener(threading.Thread):
       self.ui_queue.put(UIEvent(callback,[status,universes]))
     return universes_queue_event
 
+  def pull_devices(self, callback):
+    """Delivers a list of devices.  For now, limited to ArtNet.
+
+       Args:
+         callback: The UI callback that will be placed on the
+                   UI queue with the devices
+    """
+    device_id = 2 #Artnet
+    self.selectserver.Execute(
+      lambda:self.client.FetchDevices(self.devices_queue_callback(callback),
+                                      device_id))
+
+  def devices_queue_callback(self, callback):
+    """Creates an appropriate callback for client.FetchDevices that
+       will put the OLA response directly into the UI queue
+
+       Args:
+         callback: The UI callback that will be placed on the
+                   UI queue with the devices
+    """
+    def devices_queue_event(status,devices):
+      self.ui_queue.put(UIEvent(callback,[status,devices]))
+    return devices_queue_event

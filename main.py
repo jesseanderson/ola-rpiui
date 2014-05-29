@@ -21,11 +21,55 @@ from olalistener import OLAListener, UIEvent
 
 class PatchingPopup(Popup):
   """The popup that handles patching of new universes"""
+  #TODO: Better port data formatting
 
-  def __init__(self, **kwargs):
+  def __init__(self, ola_listener, **kwargs):
     """Initializes a listview for port selection"""
     super(PatchingPopup, self).__init__(**kwargs)
-    #TODO: Initialize a listview for port selection
+    port_converter = \
+      lambda row_index, selectable: {'text': '{0} ({1})'.format( \
+                                                           selectable[1],
+                                                           selectable[3]),
+                                     'size_hint_y': None,
+                                     'height': 25}
+    port_adapter = ListAdapter(data=[],
+                               args_converter=port_converter,
+                               selection_mode='multiple',
+                               allow_empty_selection=False,
+                               cls=ListItemButton)
+    self.ids.device_list.adapter = port_adapter
+    ola_listener.pull_devices(self.update_ports)
+
+  def update_ports(self, status, devices):
+    """Updates the listview with available ports
+
+       Args:
+         status: RequestStatus object indicating whether the 
+                 request was successful
+         devices: A list of devices
+    """
+    data = []
+    # Data list contains two instances per device, one for input
+    # and one for output (breaks ensure this)
+    for device in devices:
+      for port in device.input_ports:
+        if not port.active:
+          data.append((device.alias,
+                       device.name,
+                       port.id,
+                       "Input",
+                       False))
+          break
+      for port in device.output_ports:
+        if not port.active:
+          data.append((device.alias,
+                       device.name,
+                       port.id,
+                       "Output",
+                       True))
+          break
+    self.ids.device_list.adapter.data = data
+    self.ids.device_list.populate()
 
 class MainScreen(Screen):
   """The settings screen that the app opens to"""
@@ -176,7 +220,7 @@ class RPiUI(App):
 
   def patch_popup(self):
     """Opens the universe patching interface"""
-    popup = PatchingPopup()
+    popup = PatchingPopup(self.ola_listener)
     popup.open()
 
   def patch_universe(self):
