@@ -11,10 +11,13 @@
         GridLayout:
             cols: 2
             rows: 1
+            size_hint: 1, None
+            height: 45
             Label:
                 text: 'Universe ID:'
                 size_hint: None, None
                 height: 35
+                width: 125
             TextInput:
                 id: universe_id
                 multiline: False
@@ -24,35 +27,38 @@
         GridLayout:
             cols: 2
             rows: 1
+            size_hint: 1, None
+            height: 45
             Label:
                 text: 'Universe Name:'
                 size_hint: None, None
+                width: 125
                 height: 35
             TextInput:
                 id: universe_name
                 multiline: False
                 size_hint: None, None
                 height: 35
-                width: 200
+                width: 150
         ListView:
             id: device_list
-            size_hint: 0.8, 0.8
+            size_hint: 1, 1
         GridLayout:
             cols: 2
             rows: 1
+            size_hint: 1, None
+            height: 35
             Button:
                 id: cancel_universe
                 text: 'Cancel'
-                size_hint: None, None
-                height: 50
-                width: 200
+                size_hint: 1, None
+                height: 35
                 on_press: root.dismiss()
             Button:
                 id: patch_universe
                 text: 'Patch Universe'
-                size_hint: None, None
-                height: 50
-                width: 200
+                size_hint: 1, None
+                height: 35
                 on_press: app.patch_universe()
 
 <InfoPopup>:
@@ -87,22 +93,23 @@
         id: settings
         cols: 1
         rows: 4
+        size_hint: 1, 1
         Label: 
             id: olad_status
-            size_hint: None, None
-            size: '200dp', '48dp'
+            size_hint: 1, None
+            height: 25
         Label:
             text: 'Active Universes:'
-            size_hint: None, None
-            size: '200dp', '48dp'
+            size_hint_y: None
+            height: 25
         ListView:
             id: universe_list_view
-            size: '200dp', '150dp'
+            size_hint: 0.8, 1
         Button:
             id: patch_button
             text: 'Patch New Universe'
-            size_hint: None, None
-            size: '200dp', '48dp'
+            size_hint: 0.8, None
+            height: 25
             on_press: app.patch_popup()
 
 <PatchingScreen>:
