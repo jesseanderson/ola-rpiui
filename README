@@ -15,3 +15,13 @@ Requirements
 Usage
 -------------------------------------------------------------------------------
 python main.py in order to start the user interface
+
+Running tests
+-------------------------------------------------------------------------------
+python run_tests.py
+
+Adding tests
+-------------------------------------------------------------------------------
+Make sure it begins with 'test_' and ends with '.py'. If the test file is in a
+directory below the 'test' folder make sure to include the test in that packages
+__init__.py and __all__ variable
