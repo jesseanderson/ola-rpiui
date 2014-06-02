@@ -19,6 +19,8 @@ from kivy.adapters.listadapter import ListAdapter
 from kivy.uix.listview import ListView, ListItemButton
 from olalistener import OLAListener, UIEvent
 from settingsscreen import MainScreen, PatchingPopup
+from monitorscreen import MonitorScreen
+from consolescreen import ConsoleScreen
 
 class InfoPopup(Popup):
   pass
@@ -47,9 +49,11 @@ class RPiUI(App):
     self.devsets = MainScreen(self.change_selected_universe,
                               name='Device Settings')
     self.sm.add_widget(self.devsets)
+    self.sm.add_widget(MonitorScreen(name='DMX Monitor'))
+    self.sm.add_widget(ConsoleScreen(name='DMX Console'))
     self.layout.add_widget(self.sm)
     self.screens = {}
-    self.available_screens = ['Device Settings']
+    self.available_screens = ['Device Settings','DMX Monitor','DMX Console']
     self.screen_names = self.available_screens
     self.go_next_screen()
     Clock.schedule_interval(lambda dt: self.display_tasks(),
