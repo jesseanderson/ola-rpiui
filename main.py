@@ -23,18 +23,6 @@ from settingsscreen import MainScreen, PatchingPopup
 class InfoPopup(Popup):
   pass
 
-class PatchingScreen(Screen):
-  pass
-
-class ConsoleScreen(Screen):
-  pass
-
-class RDMSettingsScreen(Screen):
-  pass
-
-class RDMTestsScreen(Screen):
-  pass
-
 class RPiUI(App):
   """Class for drawing and handling the Kivy application itself."""
   EVENT_POLL_INTERVAL = 1 / 20
@@ -59,14 +47,9 @@ class RPiUI(App):
     self.devsets = MainScreen(self.change_selected_universe,
                               name='Device Settings')
     self.sm.add_widget(self.devsets)
-    self.sm.add_widget(PatchingScreen(name='Device Patching'))
-    self.sm.add_widget(ConsoleScreen(name='DMX Console'))
-    self.sm.add_widget(RDMSettingsScreen(name='RDM Settings'))
-    self.sm.add_widget(RDMTestsScreen(name='RDM Tests'))
     self.layout.add_widget(self.sm)
     self.screens = {}
-    self.available_screens = ['Device Settings','Device Patching',
-      'DMX Console', 'RDM Settings', 'RDM Tests']
+    self.available_screens = ['Device Settings']
     self.screen_names = self.available_screens
     self.go_next_screen()
     Clock.schedule_interval(lambda dt: self.display_tasks(),
