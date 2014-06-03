@@ -1,5 +1,10 @@
 import unittest
-from olalistener import UIEvent
+from mock import Mock, patch
+from olalistener import UIEvent, OLAListener
+from ola.ClientWrapper import SelectServer
+from ola.OlaClient import OlaClient
+from Queue import Queue
+import time
 
 class TestUIEvent(unittest.TestCase):
   """Tests the UIEvent class for passing functions to the UI"""
@@ -41,3 +46,60 @@ class TestUIEvent(unittest.TestCase):
     event.run()
     self.assertFalse(self._function_executed)
     self.assertIsNone(self._args)
+
+class TestOLAListener(unittest.TestCase):
+  """Tests the system which gets requests from the UI and evaluates them
+     using a selectserver.
+  """
+
+  def init_ola_listener(self):
+    self.ui_queue = Mock()
+    self.on_start = Mock()
+    self.on_stop = Mock()
+    self.ola_listener = OLAListener(self.ui_queue,
+                                    self.on_start,
+                                    self.on_stop)
+    self.ola_listener.start()
+
+  @patch('olalistener.OlaClient')
+  @patch('olalistener.SelectServer')
+  def test_ola_not_running(self, MockSelectServer, MockOlaClient):
+    pass
+
+  @patch('olalistener.OlaClient')
+  @patch('olalistener.SelectServer')
+  def test_ola_running(self, MockSelectServer, MockOlaClient):
+    pass
+
+  @patch('olalistener.OlaClient')
+  @patch('olalistener.SelectServer')
+  def test_pull_universes(self, MockSelectServer, MockOlaClient):
+    self.init_ola_listener()
+    callback = Mock()
+    self.ola_listener.pull_universes(callback)
+    assert MockSelectServer.called
+
+  @patch('olalistener.OlaClient')
+  @patch('olalistener.SelectServer')
+  def test_universes_queue_callback(self, MockSelectServer, MockOlaClient):
+    pass
+
+  @patch('olalistener.OlaClient')
+  @patch('olalistener.SelectServer')
+  def test_pull_devices(self, MockSelectServer, MockOlaClient):
+    pass
+
+  @patch('olalistener.OlaClient')
+  @patch('olalistener.SelectServer')
+  def test_devices_queue_callback(self, MockSelectServer, MockOlaClient):
+    pass
+
+  @patch('olalistener.OlaClient')
+  @patch('olalistener.SelectServer')
+  def test_patch(self, MockSelectServer, MockOlaClient):
+    pass
+
+  @patch('olalistener.OlaClient')
+  @patch('olalistener.SelectServer')
+  def test_patch_callback(self, MockSelectServer, MockOlaClient):
+    pass
