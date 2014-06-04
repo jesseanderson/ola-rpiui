@@ -21,6 +21,8 @@ from olalistener import OLAListener, UIEvent
 from settingsscreen import MainScreen, PatchingPopup
 from monitorscreen import MonitorScreen
 from consolescreen import ConsoleScreen
+from ola.OlaClient import OlaClient
+from ola.ClientWrapper import SelectServer
 
 class InfoPopup(Popup):
   pass
@@ -64,6 +66,8 @@ class RPiUI(App):
   def on_start(self):
     """Executed after build()"""
     self.ola_listener = OLAListener(self.ui_queue,
+                                    self.create_select_server,
+                                    self.create_ola_client,
                                     self.start_ola,
                                     self.stop_ola)
     self.ola_listener.start()
@@ -78,6 +82,14 @@ class RPiUI(App):
   def on_resume(self):
     """Because pausing is not allowed, nothing to do here"""
     pass
+
+  @staticmethod
+  def create_select_server():
+    return SelectServer()
+
+  @staticmethod
+  def create_ola_client():
+    return OlaClient()
 
   def start_ola(self):
     """Executed when OLAD starts, enables proper UI actions"""

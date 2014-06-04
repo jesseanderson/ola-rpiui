@@ -1,8 +1,6 @@
 import sys
 import threading
 import time
-from ola.ClientWrapper import ClientWrapper, SelectServer
-from ola.OlaClient import OlaClient, OLADNotRunningException
 
 class UIEvent(object):
   """Describes events that the UI needs to execute"""
@@ -23,16 +21,21 @@ class UIEvent(object):
 class OLAListener(threading.Thread):
   """Makes all requested calls to OLA in its own thread."""
 
-  def __init__(self, ui_queue, on_start, on_stop):
+  def __init__(self, ui_queue, selectserver_builder, ola_client_builder,
+               on_start, on_stop):
     """Initializes OLA objects; determines if OLAD is running upon start.
 
        Args:
          ui_queue: A Queue where UI events are held.
-         on_start: function to execute when OLA starts
-         on_stop: function to execute when OLA stops
+         selectserver_builder: Builds a SelectServer object for OLA tasks
+         ola_client_builder: Builds the OLA Client itself
+         on_start: UI Method to execute upon the starting of OLAD
+         on_stop: UI Method to execute upon the stopping of OLAD 
     """
     super(OLAListener,self).__init__()
     self.ui_queue = ui_queue
+    self.create_select_server = selectserver_builder
+    self.create_ola_client = ola_client_builder
     self.start_event = UIEvent(on_start)
     self.stop_event = UIEvent(on_stop)
     self.daemon = True #Thread quits when main thread quits
@@ -40,8 +43,8 @@ class OLAListener(threading.Thread):
   def run(self):
     """Initializes and runs an OLA SelectServer"""
     try:
-      self.client = OlaClient()
-      self.selectserver = SelectServer()
+      self.client = self.create_ola_client()
+      self.selectserver = self.create_select_server()
       self.selectserver.AddReadDescriptor(self.client.GetSocket(),
                                           self.client.SocketReady)
       self.ui_queue.put(self.start_event)
