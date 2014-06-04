@@ -131,12 +131,20 @@ class TestOLAListener(unittest.TestCase):
     self.on_start = MagicMock()
     self.on_stop = MagicMock()
     self.ola_listener = OLAListener(self.ui_queue,
-                                    MockSelectServer,
-                                    MockOlaClient,
+                                    self.create_mock_select_server,
+                                    self.create_mock_ola_client,
                                     self.on_start,
                                     self.on_stop)
     self.ola_listener.start()
     time.sleep(0.1) #Give the OLAListenerThread time to initialize
+
+  @staticmethod
+  def create_mock_select_server():
+    return MockSelectServer()
+
+  @staticmethod
+  def create_mock_ola_client():
+    return MockOlaClient()
 
   def clear_ui_queue(self):
     """Executes every UIEvent in the UI Queue, then terminates"""
