@@ -64,16 +64,11 @@ class OLAListener(threading.Thread):
           callback: The UI callback that will be placed on the 
                     UI queue with the universes
     """
-    def universes_queue_callback(callback):
-      """Creates an appropriate callback for client.FetchUniverses that
-         will put the OLA response directly into the UI queue
-      """
-      def universes_queue_event(status,universes):
-        self.ui_queue.put(UIEvent(callback,[status,universes]))
-      return universes_queue_event
-
     self.selectserver.Execute(
-      lambda:self.client.FetchUniverses(universes_queue_callback(callback)))
+      lambda: self.client.FetchUniverses(
+        lambda status, universes: 
+          self.ui_queue.put(UIEvent(callback, [status,universes]))))
+
 
   def pull_devices(self, callback):
     """Delivers a list of devices.
@@ -82,16 +77,10 @@ class OLAListener(threading.Thread):
          callback: The UI callback that will be placed on the
                    UI queue with the devices
     """
-    def devices_queue_callback(callback):
-      """Creates an appropriate callback for client.FetchDevices that
-         will put the OLA response directly into the UI queue
-      """
-      def devices_queue_event(status,devices):
-        self.ui_queue.put(UIEvent(callback,[status,devices]))
-      return devices_queue_event
-
     self.selectserver.Execute(
-      lambda:self.client.FetchDevices(devices_queue_callback(callback)))
+      lambda: self.client.FetchDevices(
+        lambda status, devices:
+          self.ui_queue.put(UIEvent(callback, [status,devices]))))
 
   def patch(self, device_alias, port, is_output, universe_id, 
             universe_name, callback):
