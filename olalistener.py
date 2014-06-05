@@ -51,6 +51,7 @@ class OLAListener(threading.Thread):
                                             self.client.SocketReady)
         self.ui_queue.put(self.start_event)
         self.selectserver.Run()
+        self._stopped = True
       except:
         #TODO: Make a flag of some sort so that stop_event is only put
         # on the queue once.  Also, this will allow me to remove the sleep()
