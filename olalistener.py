@@ -38,23 +38,31 @@ class OLAListener(threading.Thread):
     self.create_ola_client = ola_client_builder
     self.start_event = UIEvent(on_start)
     self.stop_event = UIEvent(on_stop)
-    self.daemon = True #Thread quits when main thread quits
+    self.selectserver = None
 
   def run(self):
     """Initializes and runs an OLA SelectServer"""
-    try:
-      self.client = self.create_ola_client()
-      self.selectserver = self.create_select_server()
-      self.selectserver.AddReadDescriptor(self.client.GetSocket(),
-                                          self.client.SocketReady)
-      self.ui_queue.put(self.start_event)
-      self.selectserver.Run()
-    except:
-      #TODO: Make a flag of some sort so that stop_event is only put
-      # on the queue once.  Also, this will allow me to remove the sleep()
-      self.ui_queue.put(self.stop_event)
-      time.sleep(1) #Ensures tasks are not put on the queue too quickly.
-      self.run()
+    self._stopped = False
+    while not self._stopped:
+      try:
+        self.client = self.create_ola_client()
+        self.selectserver = self.create_select_server()
+        self.selectserver.AddReadDescriptor(self.client.GetSocket(),
+                                            self.client.SocketReady)
+        self.ui_queue.put(self.start_event)
+        self.selectserver.Run()
+      except:
+        #TODO: Make a flag of some sort so that stop_event is only put
+        # on the queue once.  Also, this will allow me to remove the sleep()
+        self.ui_queue.put(self.stop_event)
+        self.selectserver = None
+        time.sleep(1) #Ensures tasks are not put on the queue too quickly.
+
+  def stop(self):
+    """Terminates the OLAListener thread if it is running"""
+    self._stopped = True
+    if self.selectserver:
+      self.selectserver.Terminate()
 
   def pull_universes(self, callback):
     """Executes the get universes request in the selectserver with a callback 

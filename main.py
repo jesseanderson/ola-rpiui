@@ -73,7 +73,8 @@ class RPiUI(App):
     self.ola_listener.start()
 
   def on_stop(self):
-    pass
+    """Executed when the application quits"""
+    self.ola_listener.stop()
 
   def on_pause(self):
     """Pausing is not allowed; the application will close instead"""
