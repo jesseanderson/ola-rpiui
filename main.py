@@ -21,9 +21,16 @@ from olalistener import OLAListener, UIEvent
 from settingsscreen import MainScreen, PatchingPopup
 from monitorscreen import MonitorScreen
 from consolescreen import ConsoleScreen
+from ola.OlaClient import OlaClient
+from ola.ClientWrapper import SelectServer
 
 class InfoPopup(Popup):
   pass
+
+class ConfirmationPopup(Popup):
+  def __init__(self, ola_listener, **kwargs):
+    super(ConfirmationPopup, self).__init__(**kwargs)
+    self.ola_listener = ola_listener
 
 class RPiUI(App):
   """Class for drawing and handling the Kivy application itself."""
@@ -64,12 +71,16 @@ class RPiUI(App):
   def on_start(self):
     """Executed after build()"""
     self.ola_listener = OLAListener(self.ui_queue,
+                                    self.create_select_server,
+                                    self.create_ola_client,
                                     self.start_ola,
                                     self.stop_ola)
     self.ola_listener.start()
+ 
 
   def on_stop(self):
-    pass
+    """Executed when the application quits"""
+    self.ola_listener.stop()
 
   def on_pause(self):
     """Pausing is not allowed; the application will close instead"""
@@ -78,6 +89,14 @@ class RPiUI(App):
   def on_resume(self):
     """Because pausing is not allowed, nothing to do here"""
     pass
+
+  @staticmethod
+  def create_select_server():
+    return SelectServer()
+
+  @staticmethod
+  def create_ola_client():
+    return OlaClient()
 
   def start_ola(self):
     """Executed when OLAD starts, enables proper UI actions"""
@@ -140,6 +159,51 @@ class RPiUI(App):
     """Opens the universe patching interface"""
     self.patching_popup = PatchingPopup(self.ola_listener)
     self.patching_popup.open()
+
+  def unpatch_confirmation(self):
+    """Opens the confirmation dialog for unpatching"""
+    unpatch_confirmation = ConfirmationPopup(self.ola_listener)
+    unpatch_confirmation.ids.confirmation.text = ("Are you sure you\n"
+                                                  "want to unpatch the\n"
+                                                  "selected universe?")
+    unpatch_confirmation.ids.confirmation_button.on_press = \
+      self.unpatch_universe_popup(unpatch_confirmation)
+    unpatch_confirmation.open()
+
+  def unpatch_universe_popup(self, popup):
+    """Creates the appropriate unpatching method for the given popup
+
+       Args:
+         popup: The confirmation popup to be closed upon completion
+    """
+    def unpatch_universe():
+      """Makes the unpatching call to the olalistener"""
+      self.ola_listener.unpatch(self.selected_universe.id,
+                                self.unpatch_callback_popup(popup))
+    return unpatch_universe
+
+  def unpatch_callback_popup(self, popup):
+    """Creates the appropriate unpatching callback for the given popup
+
+       Args:
+         popup: The confirmation popup to be closed upon completion
+    """
+    def unpatch_callback(status):
+      """The callback that will update the UI after an unpatch
+
+         Args:
+           status: RequestStatus object indicating success or failure
+      """
+      if status.Succeeded():
+        popup.dismiss()
+      else:
+        popup.dismiss()
+        info_popup = InfoPopup()
+        info_popup.title = 'ERROR'
+        info_popup.ids.info.text = ("Unpatching Failed!"
+                                    "Please try again.")
+        info_popup.open()
+    return unpatch_callback
 
   def patch_universe(self):
     """On the UI button press, closes the patching popup

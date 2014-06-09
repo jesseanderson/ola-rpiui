@@ -81,6 +81,34 @@
             text: 'Close'
             on_press: root.dismiss()
 
+<ConfirmationPopup>:
+    size_hint: None, None
+    height: 200
+    width: 250
+    title: 'ALERT'
+    GridLayout:
+        rows: 2
+        cols: 1
+        size_hint: 1, 1
+        Label:
+            id: confirmation
+            size_hint: 1, 1
+            halign: 'center'
+        GridLayout:
+            rows: 1
+            cols: 2
+            size_hint: 1, None
+            height: 30
+            Button:
+                size_hint: 0.9, 0.9
+                text: 'Cancel'
+                on_press: root.dismiss()
+            Button:
+                size_hint: 0.9, 0.9
+                id: confirmation_button
+                text: 'Confirm'
+ 
+
 <Screen>:
     canvas.before:
 		Color:
@@ -92,7 +120,7 @@
     GridLayout:
         id: settings
         cols: 1
-        rows: 4
+        rows: 5
         size_hint: 1, 1
         Label: 
             id: olad_status
@@ -111,6 +139,12 @@
             size_hint: 0.8, None
             height: 25
             on_press: app.patch_popup()
+        Button:
+            id: unpatch_button
+            text: 'Unpatch Selected Universe'
+            size_hint: 0.8, None
+            on_press: app.unpatch_confirmation()
+            height: 25
 
 <MonitorScreen>:
     GridLayout:
