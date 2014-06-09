@@ -154,3 +154,4 @@ class OLAListener(threading.Thread):
                                            unpatch_callback(callback)))
     self.selectserver.Execute(
       lambda: self.client.FetchDevices(devices_callback))
+
