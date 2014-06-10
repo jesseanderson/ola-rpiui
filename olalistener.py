@@ -125,6 +125,14 @@ class OLAListener(threading.Thread):
          callback: The function to call once complete, takes one argument, a
            RequestStatus object.
     """
+    def create_olaclient_task(task, args):
+      """Used to solve problems with python iteration and lambdas
+         Args:
+           tasks: function to execute
+           args: a list of args for that function
+      """
+      return lambda: task(*args)
+
     def unpatch_callback(callback):
       """Creates an appropriate callback for client.PatchPort that
          will put the OLA response directly onto the UI queue
@@ -138,20 +146,18 @@ class OLAListener(threading.Thread):
       for device in devices:
         for port in device.input_ports:
           if port.universe == universe_id:
-            device_alias = device.alias
-            port_id = port.id
             self.selectserver.Execute(
-              lambda:self.client.PatchPort(device_alias, port_id, False,
-                                           self.client.UNPATCH, universe_id,
-                                           unpatch_callback(callback)))
+              create_olaclient_task(self.client.PatchPort, 
+                                    [device.alias, port.id, False,
+                                     self.client.UNPATCH, universe_id,
+                                     unpatch_callback(callback)]))
         for port in device.output_ports:
           if port.universe == universe_id:
-            device_alias = device.alias
-            port_id = port.id
             self.selectserver.Execute(
-              lambda:self.client.PatchPort(device_alias, port_id, True,
-                                           self.client.UNPATCH, universe_id,
-                                           unpatch_callback(callback)))
+              create_olaclient_task(self.client.PatchPort,
+                                    [device.alias, port.id, True,
+                                     self.client.UNPATCH, universe_id,
+                                     unpatch_callback(callback)]))
     self.selectserver.Execute(
       lambda: self.client.FetchDevices(devices_callback))
 
