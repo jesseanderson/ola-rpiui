@@ -65,6 +65,15 @@ class OLAListener(threading.Thread):
     if self.selectserver:
       self.selectserver.Terminate()
 
+  def create_olaclient_callback(self, task, args):
+    """Creates the necessary function for use client task execution.
+
+       Args:
+         task: function to execute
+         args: a list of args for that function
+    """
+    return lambda: task(*args)
+
   def pull_universes(self, callback):
     """Executes the get universes request in the selectserver with a callback 
        that will put the universes in the UI queue
@@ -125,13 +134,6 @@ class OLAListener(threading.Thread):
          callback: The function to call once complete, takes one argument, a
            RequestStatus object.
     """
-    def create_olaclient_task(task, args):
-      """Used to solve problems with python iteration and lambdas
-         Args:
-           tasks: function to execute
-           args: a list of args for that function
-      """
-      return lambda: task(*args)
 
     def unpatch_callback(callback):
       """Creates an appropriate callback for client.PatchPort that
@@ -147,17 +149,17 @@ class OLAListener(threading.Thread):
         for port in device.input_ports:
           if port.universe == universe_id:
             self.selectserver.Execute(
-              create_olaclient_task(self.client.PatchPort, 
-                                    [device.alias, port.id, False,
-                                     self.client.UNPATCH, universe_id,
-                                     unpatch_callback(callback)]))
+              self.create_olaclient_callback(self.client.PatchPort, 
+                                             [device.alias, port.id, False,
+                                              self.client.UNPATCH, universe_id,
+                                              unpatch_callback(callback)]))
         for port in device.output_ports:
           if port.universe == universe_id:
             self.selectserver.Execute(
-              create_olaclient_task(self.client.PatchPort,
-                                    [device.alias, port.id, True,
-                                     self.client.UNPATCH, universe_id,
-                                     unpatch_callback(callback)]))
+              self.create_olaclient_callback(self.client.PatchPort,
+                                             [device.alias, port.id, True,
+                                              self.client.UNPATCH, universe_id,
+                                              unpatch_callback(callback)]))
     self.selectserver.Execute(
       lambda: self.client.FetchDevices(devices_callback))
 
