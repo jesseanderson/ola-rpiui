@@ -4,7 +4,8 @@ import array
 from mock import Mock, MagicMock, patch
 from olalistener import UIEvent, OLAListener
 from ola.ClientWrapper import SelectServer
-from ola.OlaClient import OlaClient, RequestStatus, Universe, Device, Plugin
+from ola.OlaClient import OlaClient, RequestStatus, Universe
+from ola.OlaClient import Device, Plugin, Port
 from Queue import Queue, Empty
 import time
 
@@ -88,7 +89,7 @@ class MockOlaClient(OlaClient):
   def PluginDescription(self, callback, plugin_id):
     callback(None,"Test Plugin Description")
   def FetchDevices(self, callback):
-    callback(None,[Device(123,1,"Test Device",None,[],[])])
+    callback(None,[Device(123,1,"Test Device",None,[Port(1,50,True,"",False)],[])])
   def FetchUniverses(self, callback):
     callback(None,[Universe(123,"Test Universe", Universe.LTP)])
   def FetchDmx(self, universe, callback):
@@ -199,5 +200,17 @@ class TestOLAListener(unittest.TestCase):
     def callback(status):
       self.callback_executed = True
     self.ola_listener.patch(1,1,False,2,"Test Patch",callback)
+    self.clear_ui_queue()
+    self.assertTrue(self.callback_executed)
+
+  def test_unpatch(self):
+    """Tests the OLALstener's unpatch method. The request to unpatch
+       universe 50 ensures the callback should be called, as there is a port
+       in the dummy olaclient that has this universe number assigned.
+    """
+    self.callback_executed = False
+    def callback(status):
+      self.callback_executed = True
+    self.ola_listener.unpatch(50,callback)
     self.clear_ui_queue()
     self.assertTrue(self.callback_executed)
