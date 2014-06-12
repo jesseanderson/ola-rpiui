@@ -163,6 +163,22 @@ class OLAListener(threading.Thread):
     self.selectserver.Execute(
       lambda: self.client.FetchDevices(devices_callback))
 
+  def fetch_dmx(self, universe, callback):
+    """Fetches the current array of DMX channels.  For most DMX Listening we
+       we use start_dmx_listener below. However, it does not return a frame
+       immediately after it starts.  We use this to initialize the UI immediately
+       after switching universes.
+
+       Args:
+         universe: the universe id to get data for
+         callback: The callback to call once complete, takes a RequestStatus
+                   object, a universe number, and a list of DMX
+    """
+    if self.selectserver and self.client:
+      self.selectserver.Execute(
+        lambda:self.client.FetchDmx(universe, \
+          lambda s,u,d: self.ui_queue.put(UIEvent(callback,[s,u,d]))))
+
   def start_dmx_listener(self, universe, data_callback, callback):
     """Starts a listener that will call data_callback every time
        there is new DMX data.
@@ -170,7 +186,7 @@ class OLAListener(threading.Thread):
        Args:
          universe: The universe id to listen for
          data_callback: The function to call every time there is new data
-         callback: The callback for when the request is complete
+         callback: The callback for when the request is complete.
     """
     if self.selectserver and self.client:
       self.selectserver.Execute(

@@ -157,6 +157,8 @@ class RPiUI(App):
       if self.selected_universe:
         self.ola_listener.stop_dmx_listener(self.selected_universe.id, None, None)
       self.selected_universe = adapter.data[adapter.selection[0].index]
+      self.ola_listener.fetch_dmx(self.selected_universe.id,
+                                  lambda s,u,d: self.monitor_screen.update_data(d))
       self.ola_listener.start_dmx_listener(self.selected_universe.id,
                                            self.monitor_screen.update_data, None)
 

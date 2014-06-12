@@ -8,7 +8,6 @@ class MonitorScreen(Screen):
   """
   #TODO: Make cells look much nicer
   #TODO: Implement dynamic height for the stacklayout
-  #TODO: Implement data upon universe switch
   def __init__(self, **kwargs):
     super(MonitorScreen, self).__init__(**kwargs)
     self.channels = []
