@@ -93,7 +93,7 @@ class MockOlaClient(OlaClient):
   def FetchUniverses(self, callback):
     callback(None,[Universe(123,"Test Universe", Universe.LTP)])
   def FetchDmx(self, universe, callback):
-    callback(None,1,[array('B',[0,1,2,3])])
+    callback(None,1,[0,1,2,3])
   def SendDmx(self, universe, data, callback=None):
     if callback:
       callback(None)
@@ -212,5 +212,33 @@ class TestOLAListener(unittest.TestCase):
     def callback(status):
       self.callback_executed = True
     self.ola_listener.unpatch(50,callback)
+    self.clear_ui_queue()
+    self.assertTrue(self.callback_executed)
+
+  def test_fetch_dmx(self):
+    """Tests the OLAListener's fetch_dmx method"""
+    self.callback_executed = False
+    def callback(status, universe, data):
+      self.assertEqual(data[3], 3)
+      self.callback_executed = True
+    self.ola_listener.fetch_dmx(1, callback)
+    self.clear_ui_queue()
+    self.assertTrue(self.callback_executed)
+
+  def test_start_dmx_listener(self):
+    """Tests the OLAListener's start_dmx_listener method"""
+    self.callback_executed = False
+    def callback(status):
+      self.callback_executed = True
+    self.ola_listener.start_dmx_listener(1, None, callback)
+    self.clear_ui_queue()
+    self.assertTrue(self.callback_executed)
+
+  def test_stop_dmx_listener(self):
+    """Tests the OLAListener's stop_dmx_listener method"""
+    self.callback_executed = False
+    def callback(status):
+      self.callback_executed = True
+    self.ola_listener.stop_dmx_listener(1, None, callback)
     self.clear_ui_queue()
     self.assertTrue(self.callback_executed)
