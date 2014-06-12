@@ -22,7 +22,7 @@ class MonitorScreen(Screen):
     self.channels = []
     for channel_index in range(_DMX_CHANNELS):
       channel = MonitorCell(width=_CELL_WIDTH,height=_CELL_HEIGHT)
-      channel.ids.channel.text = str(channel_index)
+      channel.ids.channel.text = str(channel_index+1)
       self.channels.append(channel)
       self.ids.grid.add_widget(channel)
 
