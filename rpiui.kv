@@ -146,6 +146,27 @@
             on_press: app.unpatch_confirmation()
             height: 25
 
+<MonitorCell>:
+    size_hint: None, None
+    rows: 2
+    cols: 1
+    canvas.before:
+        Color:
+            rgba: 0, 0.5, 0, self.alpha
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    Label:
+        id: channel
+        size_hint: 1, 1
+        font_size: 10
+        halign: 'center'
+    Label:
+        id: data
+        size_hint: 1, 1
+        font_size: 15
+        halign: 'center'
+
 <MonitorScreen>:
     GridLayout:
         id: monitor

@@ -1,11 +1,16 @@
 import math
 import kivy
+from kivy.properties import NumericProperty
 from kivy.uix.screenmanager import Screen
+from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 
 _CELL_WIDTH = 32
 _CELL_HEIGHT = 32
 _DMX_CHANNELS = 512
+
+class MonitorCell(GridLayout):
+  alpha = NumericProperty(0)
 
 class MonitorScreen(Screen):
   """This screen displays the values of as many DMX channels as will fit
@@ -16,8 +21,8 @@ class MonitorScreen(Screen):
     super(MonitorScreen, self).__init__(**kwargs)
     self.channels = []
     for channel_index in range(_DMX_CHANNELS):
-      channel = Label(text='X',size_hint=(None,None),
-                      width=_CELL_WIDTH,height=_CELL_HEIGHT)
+      channel = MonitorCell(width=_CELL_WIDTH,height=_CELL_HEIGHT)
+      channel.ids.channel.text = str(channel_index)
       self.channels.append(channel)
       self.ids.grid.add_widget(channel)
 
@@ -29,7 +34,8 @@ class MonitorScreen(Screen):
     """
     index = 0
     for channel in data:
-      self.channels[index].text = str(channel)
+      self.channels[index].ids.data.text = str(channel)
+      self.channels[index].alpha = float(channel) / _DMX_CHANNELS
       index = index + 1
 
   def update_grid_height(self):
