@@ -163,3 +163,16 @@ class OLAListener(threading.Thread):
     self.selectserver.Execute(
       lambda: self.client.FetchDevices(devices_callback))
 
+  def start_dmx_listener(self, universe, data_callback, callback):
+    """Starts a listener that will call data_callback every time
+       there is new DMX data.
+
+       Args:
+         universe: The universe id to listen for
+         data_callback: The function to call every time there is new data
+         callback: The callback for when the request is complete
+    """
+    self.selectserver.Execute(
+      lambda:self.client.RegisterUniverse(universe, self.client.REGISTER, \
+        lambda data: self.ui_queue.put(UIEvent(data_callback,[data])),
+        lambda status: self.ui_queue.put(UIEvent(callback,[status]))))
