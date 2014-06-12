@@ -1,3 +1,4 @@
+import math
 import kivy
 from kivy.uix.screenmanager import Screen
 from kivy.uix.label import Label
@@ -7,7 +8,6 @@ class MonitorScreen(Screen):
      on the screen.
   """
   #TODO: Make cells look much nicer
-  #TODO: Implement dynamic height for the stacklayout
   def __init__(self, **kwargs):
     super(MonitorScreen, self).__init__(**kwargs)
     self.channels = []
@@ -26,3 +26,9 @@ class MonitorScreen(Screen):
     for channel in data:
       self.channels[index].text = str(channel)
       index = index + 1
+
+  def update_grid_height(self):
+    """The grid height must be as high as its last visible child in order
+       for the ScrollView to work as intended.
+    """
+    self.ids.grid.height = 32 * math.ceil(512.0 / (self.ids.monitor.width / 32))
