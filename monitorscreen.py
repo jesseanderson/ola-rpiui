@@ -6,6 +6,9 @@ class MonitorScreen(Screen):
   """This screen displays the values of as many DMX channels as will fit
      on the screen.
   """
+  #TODO: Make cells look much nicer
+  #TODO: Implement dynamic height for the stacklayout
+  #TODO: Implement data upon universe switch
   def __init__(self, **kwargs):
     super(MonitorScreen, self).__init__(**kwargs)
     self.channels = []
@@ -14,8 +17,13 @@ class MonitorScreen(Screen):
       self.channels.append(channel)
       self.ids.grid.add_widget(channel)
 
-  def go_previous_page(self):
-    pass
+  def update_data(self, data):
+    """Takes the new data and displays it in all 512 cells
 
-  def go_next_page(self):
-    pass
+       Args:
+         data: an array of size 512 containing the dmx data
+    """
+    index = 0
+    for channel in data:
+      self.channels[index].text = str(channel)
+      index = index + 1

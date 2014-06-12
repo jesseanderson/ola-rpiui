@@ -56,7 +56,8 @@ class RPiUI(App):
     self.devsets = MainScreen(self.change_selected_universe,
                               name='Device Settings')
     self.sm.add_widget(self.devsets)
-    self.sm.add_widget(MonitorScreen(name='DMX Monitor'))
+    self.monitor_screen = MonitorScreen(name='DMX Monitor')
+    self.sm.add_widget(self.monitor_screen)
     self.sm.add_widget(ConsoleScreen(name='DMX Console'))
     self.layout.add_widget(self.sm)
     self.screens = {}
@@ -153,7 +154,11 @@ class RPiUI(App):
     if len(adapter.selection) == 0:
       self.selected_universe = None
     else:
+      if self.selected_universe:
+        self.ola_listener.stop_dmx_listener(self.selected_universe.id, None, None)
       self.selected_universe = adapter.data[adapter.selection[0].index]
+      self.ola_listener.start_dmx_listener(self.selected_universe.id,
+                                           self.monitor_screen.update_data, None)
 
   def patch_popup(self):
     """Opens the universe patching interface"""

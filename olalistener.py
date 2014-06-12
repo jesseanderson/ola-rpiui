@@ -172,7 +172,22 @@ class OLAListener(threading.Thread):
          data_callback: The function to call every time there is new data
          callback: The callback for when the request is complete
     """
-    self.selectserver.Execute(
-      lambda:self.client.RegisterUniverse(universe, self.client.REGISTER, \
-        lambda data: self.ui_queue.put(UIEvent(data_callback,[data])),
-        lambda status: self.ui_queue.put(UIEvent(callback,[status]))))
+    if self.selectserver and self.client:
+      self.selectserver.Execute(
+        lambda:self.client.RegisterUniverse(universe, self.client.REGISTER, \
+          lambda data: self.ui_queue.put(UIEvent(data_callback,[data])),
+          lambda status: self.ui_queue.put(UIEvent(callback,[status]))))
+
+  def stop_dmx_listener(self, universe, data_callback, callback):
+    """Stops listening for DMX updates to universe.
+
+       Args:
+         universe: the universe to no longer listen for
+         data_callback: the data callback to stop
+         callback: the function to call once complete
+    """
+    if self.selectserver and self.client:
+      self.selectserver.Execute(
+        lambda:self.client.RegisterUniverse(universe, self.client.UNREGISTER, \
+          lambda data: self.ui_queue.put(UIEvent(data_callback,[data])),
+          lambda status: self.ui_queue.put(UIEvent(callback,[status]))))
