@@ -59,7 +59,7 @@
                 text: 'Patch Universe'
                 size_hint: 1, None
                 height: 35
-                on_press: app.patch_universe()
+                on_press: root.patch_universe()
 
 <InfoPopup>:
     size_hint: None, None
@@ -138,12 +138,12 @@
             text: 'Patch New Universe'
             size_hint: 0.8, None
             height: 25
-            on_press: app.patch_popup()
+            on_press: root.patch_popup()
         Button:
             id: unpatch_button
             text: 'Unpatch Selected Universe'
             size_hint: 0.8, None
-            on_press: app.unpatch_confirmation()
+            on_press: root.unpatch_confirmation()
             height: 25
 
 <MonitorCell>:
