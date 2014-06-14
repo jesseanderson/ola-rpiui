@@ -1,8 +1,11 @@
 import kivy
+from kivy.lang import Builder
 from kivy.uix.screenmanager import Screen
 from kivy.adapters.listadapter import ListAdapter
 from kivy.uix.listview import ListView, ListItemButton
 from kivy.uix.popup import Popup
+
+Builder.load_file('settingsscreen.kv')
 
 class MainScreen(Screen):
   """The settings screen that the app opens to"""
