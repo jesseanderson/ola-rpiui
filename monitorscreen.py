@@ -1,5 +1,6 @@
 import math
 import kivy
+from kivy.lang import Builder
 from kivy.properties import NumericProperty
 from kivy.uix.screenmanager import Screen
 from kivy.uix.gridlayout import GridLayout
@@ -8,6 +9,8 @@ from kivy.uix.label import Label
 _CELL_WIDTH = 32
 _CELL_HEIGHT = 32
 _DMX_CHANNELS = 512
+
+Builder.load_file('monitorscreen.kv')
 
 class MonitorCell(GridLayout):
   alpha = NumericProperty(0)
