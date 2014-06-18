@@ -10,7 +10,7 @@ Builder.load_file('settingsscreen.kv')
 class MainScreen(Screen):
   """The settings screen that the app opens to"""
 
-  def __init__(self,ola_listener,onchange_callback,**kwargs):
+  def __init__(self, ola_listener, onchange_callback, **kwargs):
     """Initializes the listview that contains the universe selection.
 
        Args:
