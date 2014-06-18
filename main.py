@@ -91,18 +91,11 @@ class RPiUI(App):
 
   def start_ola(self):
     """Executed when OLAD starts, enables proper UI actions"""
-    self.devsets.ids.olad_status.text = "OLAD is Running"
-    Clock.schedule_interval(self.devsets.display_universes,
-                            self.UNIVERSE_POLL_INTERVAL)
-    self.devsets.ids.universe_list_view.disabled = False
-    self.devsets.ids.patch_button.disabled = False
+    self.devsets.start_ola(self.UNIVERSE_POLL_INTERVAL)
 
   def stop_ola(self):
     """Executed when OLAD stops, disables proper UI actions"""
-    self.devsets.ids.olad_status.text = "OLAD is Stopped"
-    Clock.unschedule(self.display_universes)
-    self.devsets.ids.universe_list_view.disabled = True
-    self.devsets.ids.patch_button.disabled = True
+    self.devsets.stop_ola()
 
   def display_tasks(self):
     """Polls for events that need to update the UI, 
