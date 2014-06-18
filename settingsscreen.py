@@ -1,5 +1,6 @@
 import kivy
 from kivy.lang import Builder
+from kivy.clock import Clock
 from kivy.uix.screenmanager import Screen
 from kivy.adapters.listadapter import ListAdapter
 from kivy.uix.listview import ListView, ListItemButton
@@ -10,7 +11,7 @@ Builder.load_file('settingsscreen.kv')
 class MainScreen(Screen):
   """The settings screen that the app opens to"""
 
-  def __init__(self,ola_listener,onchange_callback,**kwargs):
+  def __init__(self, ola_listener, onchange_callback, **kwargs):
     """Initializes the listview that contains the universe selection.
 
        Args:
@@ -36,6 +37,28 @@ class MainScreen(Screen):
                                cls=ListItemButton)
     list_adapter.bind(on_selection_change=onchange_callback)
     self.ids.universe_list_view.adapter = list_adapter
+
+  def start_ola(self, universe_poll_interval):
+    """Enables UI actions upon starting of OLAD.
+
+       Args:
+         universe_poll_interval: The interval in seconds between each time
+                                 universe list updates.
+    """
+    self.ids.olad_status.text = "OLAD is Running"
+    Clock.schedule_interval(self.display_universes,
+                            universe_poll_interval)
+    self.ids.universe_list_view.disabled = False
+    self.ids.patch_button.disabled = False
+    self.ids.unpatch_button.disabled = False
+
+  def stop_ola(self):
+    """Disables UI on main screen"""
+    self.ids.olad_status.text = "OLAD is Stopped"
+    Clock.unschedule(self.display_universes)
+    self.ids.universe_list_view.disabled = True
+    self.ids.patch_button.disabled = True
+    self.ids.unpatch_button.disabled = True
 
   def display_universes(self, dt):
     """Makes a call to fetch the active universes; then put them in the

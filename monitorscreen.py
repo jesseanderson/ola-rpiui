@@ -19,7 +19,6 @@ class MonitorScreen(Screen):
   """This screen displays the values of as many DMX channels as will fit
      on the screen.
   """
-  #TODO: Make cells look much nicer
   def __init__(self, **kwargs):
     super(MonitorScreen, self).__init__(**kwargs)
     self.channels = []

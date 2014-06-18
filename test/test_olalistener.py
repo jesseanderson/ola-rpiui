@@ -39,7 +39,7 @@ class TestUIEvent(unittest.TestCase):
     event = UIEvent(self.uievent_function, test_args)
     event.run()
     self.assertTrue(self._function_executed)
-    self.assertEquals(self._args, (1,'hello',2))
+    self.assertEquals(self._args, (1, 'hello', 2))
 
   def test_none_as_input(self):
     """Tests to see that UIEvent accepts None as a function and
@@ -78,22 +78,23 @@ class MockSelectServer(SelectServer):
 
 class MockOlaClient(OlaClient):
   #All RequestStatus and RDMResponse objects left as Nones for now
-  def __init__(self, our_socket = None, close_callback = None):
+  def __init__(self, our_socket=None, close_callback=None):
     pass
   def GetSocket(self):
     return socket.socket()
   def SocketReady(self):
     pass
   def FetchPlugins(self, callback):
-    callback(None,[Plugin(123,"Test Plugin")])
+    callback(None, [Plugin(123, "Test Plugin")])
   def PluginDescription(self, callback, plugin_id):
-    callback(None,"Test Plugin Description")
+    callback(None, "Test Plugin Description")
   def FetchDevices(self, callback):
-    callback(None,[Device(123,1,"Test Device",None,[Port(1,50,True,"",False)],[])])
+    callback(None, [Device(123, 1, "Test Device", None, 
+                          [Port(1, 50, True, "", False)], [])])
   def FetchUniverses(self, callback):
-    callback(None,[Universe(123,"Test Universe", Universe.LTP)])
+    callback(None, [Universe(123, "Test Universe", Universe.LTP)])
   def FetchDmx(self, universe, callback):
-    callback(None,1,[0,1,2,3])
+    callback(None, 1, [0, 1, 2, 3])
   def SendDmx(self, universe, data, callback=None):
     if callback:
       callback(None)
@@ -164,7 +165,7 @@ class TestOLAListener(unittest.TestCase):
   def clear_ui_queue(self):
     """Executes every UIEvent in the UI Queue, then terminates"""
     try:
-      event = self.ui_queue.get(True,0.2)
+      event = self.ui_queue.get(True, 0.2)
       event.run()
       self.clear_ui_queue()
     except Empty:
@@ -174,8 +175,8 @@ class TestOLAListener(unittest.TestCase):
     """Tests the OLAListener's pull_universes method"""
     self.callback_executed = False
     def callback(status, universes):
-      self.assertEqual(universes[0].id,123) #Mock values
-      self.assertEqual(universes[0].name,"Test Universe")
+      self.assertEqual(universes[0].id, 123) #Mock values
+      self.assertEqual(universes[0].name, "Test Universe")
       self.callback_executed = True
     self.ola_listener.pull_universes(callback)
     self.clear_ui_queue()
@@ -185,8 +186,8 @@ class TestOLAListener(unittest.TestCase):
     """Tests the OLAListener's pull_devices method"""
     self.callback_executed = False
     def callback(status, devices):
-      self.assertEqual(devices[0].id,123) #Mock values
-      self.assertEqual(devices[0].name,"Test Device")
+      self.assertEqual(devices[0].id, 123) #Mock values
+      self.assertEqual(devices[0].name, "Test Device")
       self.callback_executed = True
     self.ola_listener.pull_devices(callback)
     self.clear_ui_queue()
@@ -199,7 +200,7 @@ class TestOLAListener(unittest.TestCase):
     self.callback_executed = False
     def callback(status):
       self.callback_executed = True
-    self.ola_listener.patch(1,1,False,2,"Test Patch",callback)
+    self.ola_listener.patch(1, 1, False, 2, "Test Patch", callback)
     self.clear_ui_queue()
     self.assertTrue(self.callback_executed)
 
@@ -211,7 +212,7 @@ class TestOLAListener(unittest.TestCase):
     self.callback_executed = False
     def callback(status):
       self.callback_executed = True
-    self.ola_listener.unpatch(50,callback)
+    self.ola_listener.unpatch(50, callback)
     self.clear_ui_queue()
     self.assertTrue(self.callback_executed)
 
