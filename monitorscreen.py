@@ -19,9 +19,17 @@ class MonitorScreen(Screen):
   """This screen displays the values of as many DMX channels as will fit
      on the screen.
   """
-  def __init__(self, **kwargs):
+  def __init__(self, ola_listener, **kwargs):
+    """Args:
+         ola_listener: an OLAListener object with which to register
+                       and unregister DMX listening.
+    """
     super(MonitorScreen, self).__init__(**kwargs)
+    self.ola_listener = ola_listener
+    self.on_pre_enter = self.register_dmx_listener
+    self.on_leave = self.unregister_dmx_listener
     self.channels = []
+    self.selected_universe = None
     for channel_index in range(_DMX_CHANNELS):
       channel = MonitorCell(width=_CELL_WIDTH,height=_CELL_HEIGHT)
       channel.ids.channel.text = str(channel_index+1)
@@ -46,3 +54,17 @@ class MonitorScreen(Screen):
     """
     self.ids.grid.height = _CELL_HEIGHT * math.ceil(float(_DMX_CHANNELS) / 
                              (self.ids.monitor.width / _CELL_WIDTH))
+
+  def unregister_dmx_listener(self):
+    """Executed when the ScreenManager switches away from the monitor screen"""
+    if self.selected_universe:
+      self.ola_listener.stop_dmx_listener(self.selected_universe.id, None, None)
+
+  def register_dmx_listener(self):
+    """Executed when the ScreenManager switches to the monitor screen"""
+    if self.selected_universe:
+      self.ola_listener.fetch_dmx(self.selected_universe.id,
+                                  lambda s,u,d: self.update_data(d))
+      self.ola_listener.start_dmx_listener(self.selected_universe.id,
+                                           self.update_data, None)
+
