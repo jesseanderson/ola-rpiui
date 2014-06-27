@@ -50,12 +50,14 @@ class RPiUI(App):
     self.sm = ScreenManager(transition=SlideTransition())
     self.monitor_screen = MonitorScreen(self.ola_listener,
                                         name='DMX Monitor')
+    self.console_screen = ConsoleScreen(self.ola_listener,
+                                        name='DMX Console')
     self.devsets = MainScreen(self.ola_listener,
                               self.change_selected_universe,
                               name='Device Settings')
     self.sm.add_widget(self.devsets)
     self.sm.add_widget(self.monitor_screen)
-    self.sm.add_widget(ConsoleScreen(name='DMX Console'))
+    self.sm.add_widget(self.console_screen)
     self.layout.add_widget(self.sm)
     self.screens = {}
     self.available_screens = ['Device Settings','DMX Monitor','DMX Console']
@@ -118,10 +120,12 @@ class RPiUI(App):
     if len(adapter.selection) == 0:
       self.devsets.selected_universe = None
       self.monitor_screen.selected_universe = None
+      self.console_screen.change_selected_universe(None)
     else:
       self.devsets.selected_universe = adapter.data[adapter.selection[0].index]
       self.monitor_screen.selected_universe = adapter.data[adapter.selection[0].index]
-
+      self.console_screen.change_selected_universe( \
+        adapter.data[adapter.selection[0].index])
 
   def go_previous_screen(self):
     """Changes the UI to view the screen to the left of the current one"""
