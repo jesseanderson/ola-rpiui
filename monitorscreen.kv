@@ -1,0 +1,35 @@
+#:kivy 1.8.0
+
+<MonitorCell>:
+    size_hint: None, None
+    rows: 2
+    cols: 1
+    canvas.before:
+        Color:
+            rgba: 0, 0.5, 0, self.alpha
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    Label:
+        id: channel
+        size_hint: 1, 1
+        font_size: 10
+        halign: 'center'
+    Label:
+        id: data
+        size_hint: 1, 1
+        font_size: 15
+        halign: 'center'
+
+<MonitorScreen>:
+    GridLayout:
+        id: monitor
+        cols: 1
+        rows: 1
+        size_hint: 1, 1
+        ScrollView:
+            StackLayout:
+                id: grid
+                size_hint: 1, None
+                height: 700
+                on_size: root.update_grid_height()

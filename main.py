@@ -38,7 +38,6 @@ class RPiUI(App):
     #TODO: Reorganize and consolidate; make necessary helper functions
     self.title = 'Open Lighting Architecture'
     self.ui_queue = Queue()
-    self.selected_universe = None
     self.layout = BoxLayout(orientation='vertical')
     self.ola_listener = OLAListener(self.ui_queue,
                                     self.create_select_server,
@@ -49,11 +48,13 @@ class RPiUI(App):
     self.layout.add_widget(self.ab)
     #Screen creation and layout placing
     self.sm = ScreenManager(transition=SlideTransition())
+    self.monitor_screen = MonitorScreen(self.ola_listener,
+                                        name='DMX Monitor')
     self.devsets = MainScreen(self.ola_listener,
                               self.change_selected_universe,
                               name='Device Settings')
     self.sm.add_widget(self.devsets)
-    self.sm.add_widget(MonitorScreen(name='DMX Monitor'))
+    self.sm.add_widget(self.monitor_screen)
     self.sm.add_widget(ConsoleScreen(name='DMX Console'))
     self.layout.add_widget(self.sm)
     self.screens = {}
@@ -115,11 +116,12 @@ class RPiUI(App):
          adapter: the adapter passed upon a listadapter on_selection_change call
     """
     if len(adapter.selection) == 0:
-      self.selected_universe = None
       self.devsets.selected_universe = None
+      self.monitor_screen.selected_universe = None
     else:
-      self.selected_universe = adapter.data[adapter.selection[0].index]
       self.devsets.selected_universe = adapter.data[adapter.selection[0].index]
+      self.monitor_screen.selected_universe = adapter.data[adapter.selection[0].index]
+
 
   def go_previous_screen(self):
     """Changes the UI to view the screen to the left of the current one"""
