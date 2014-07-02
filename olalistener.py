@@ -226,3 +226,16 @@ class OLAListener(threading.Thread):
     if self.selectserver and self.client:
       self.selectserver.Execute(
         lambda:self.client.FetchDmx(universe, recv_dmx_callback))
+
+  def send_dmx(self, universe, data, callback=None):
+    """Sends a full array of 512 dmx channels
+
+       Args:
+         universe: the universe to send dmx to
+         data: an array of size 512 containing data for all channels to be sent
+         callback: the callback after the data is sent.
+    """
+    if self.selectserver and self.client:
+      self.selectserver.Execute(
+        lambda:self.client.SendDmx(universe, data, \
+          lambda status: self.ui_queue.put(UIEvent(callback,[status]))))

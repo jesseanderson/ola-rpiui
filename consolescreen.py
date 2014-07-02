@@ -1,9 +1,12 @@
 import kivy
+from array import array
 from kivy.lang import Builder
+from kivy.clock import Clock
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.screenmanager import Screen
 
 _DMX_CHANNELS = 512
+SEND_DATA_INTERVAL = 1
 
 Builder.load_file('consolescreen.kv')
 
@@ -24,7 +27,6 @@ class Fader(GridLayout):
     self.ids.channel_label.text = str(self.channel_number)
     self.ids.channel_value.text = str(int(self.ids.channel_slider.value))
     self.ids.channel_slider.bind(value=self.update_fader_value)
-    self.ids.channel_slider.bind(value=self.send_dmx_request)
 
   def send_dmx_request(self, instance, value):
     """Responsible for making the OLAListener call for sending DMX
@@ -47,7 +49,9 @@ class ConsoleScreen(Screen):
   def __init__(self, ola_listener, **kwargs):
     super(ConsoleScreen, self).__init__(**kwargs)
     self.ola_listener = ola_listener
-    self.on_pre_enter = self.update_console_data
+    self.on_pre_enter = lambda: Clock.schedule_interval(self.send_console_data,
+                                                        SEND_DATA_INTERVAL)
+    self.on_leave = lambda: Clock.unschedule(self.send_console_data)
     self.channels = []
     self.selected_universe = None
     self.ids.faders.width = 40 * _DMX_CHANNELS
@@ -61,6 +65,13 @@ class ConsoleScreen(Screen):
     for channel in self.channels:
       channel.selected_universe = universe
     self.selected_universe = universe
+
+  def send_console_data(self, dt):
+    """The console will send its current state to the OLA client"""
+    data = []
+    for channel in self.channels:
+      data.append(int(channel.ids.channel_slider.value))
+    self.ola_listener.send_dmx(self.selected_universe.id, array('B', data))
 
   def update_data(self, data):
     """The console screen must remain updated with the actual DMX data,
