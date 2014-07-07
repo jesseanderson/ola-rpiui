@@ -243,3 +243,12 @@ class TestOLAListener(unittest.TestCase):
     self.ola_listener.stop_dmx_listener(1, None, callback)
     self.clear_ui_queue()
     self.assertTrue(self.callback_executed)
+
+  def test_send_dmx(self):
+    """Tests the OLAListener's stop_dmx method"""
+    self.callback_executed = False
+    def callback(status):
+      self.callback_executed = True
+    self.ola_listener.send_dmx(1, [0, 1, 2, 3], callback)
+    self.clear_ui_queue()
+    self.assertTrue(self.callback_executed)
