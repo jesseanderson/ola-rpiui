@@ -44,7 +44,7 @@ class OLAListener(threading.Thread):
     """Initializes and runs an OLA SelectServer"""
     self._stopped = False
     while not self._stopped:
-      try:
+      #try:
         self.client = self.create_ola_client()
         self.selectserver = self.create_select_server()
         self.selectserver.AddReadDescriptor(self.client.GetSocket(),
@@ -52,7 +52,7 @@ class OLAListener(threading.Thread):
         self.ui_queue.put(self.start_event)
         self.selectserver.Run()
         self._stopped = True
-      except:
+      #except:
         #TODO: Make a flag of some sort so that stop_event is only put
         # on the queue once.  Also, this will allow me to remove the sleep()
         self.ui_queue.put(self.stop_event)
@@ -179,7 +179,7 @@ class OLAListener(threading.Thread):
         lambda:self.client.FetchDmx(universe, \
           lambda s,u,d: self.ui_queue.put(UIEvent(callback,[s,u,d]))))
 
-  def start_dmx_listener(self, universe, data_callback, callback):
+  def start_dmx_listener(self, universe, data_callback, callback=None):
     """Starts a listener that will call data_callback every time
        there is new DMX data.
 
@@ -194,7 +194,7 @@ class OLAListener(threading.Thread):
           lambda data: self.ui_queue.put(UIEvent(data_callback,[data])),
           lambda status: self.ui_queue.put(UIEvent(callback,[status]))))
 
-  def stop_dmx_listener(self, universe, data_callback, callback):
+  def stop_dmx_listener(self, universe, data_callback, callback=None):
     """Stops listening for DMX updates to universe.
 
        Args:
@@ -207,25 +207,6 @@ class OLAListener(threading.Thread):
         lambda:self.client.RegisterUniverse(universe, self.client.UNREGISTER, \
           lambda data: self.ui_queue.put(UIEvent(data_callback,[data])),
           lambda status: self.ui_queue.put(UIEvent(callback,[status]))))
-
-  def set_dmx_channel(self, universe, channel, value, callback=None):
-    """Sets a channel on a universe to a value
-
-       Args:
-         universe: the universe to set the channel for
-         channel: the channel number to set, between 1 and 512
-         value: the DMX value, between 0 and 255 (int)
-         callback: the callback after the DMX is set
-    """
-    def recv_dmx_callback(status, uni, data):
-      data[channel-1] = value
-      self.selectserver.Execute(
-        lambda:self.client.SendDmx(universe, data, \
-          lambda status: self.ui_queue.put(UIEvent(callback,[status]))))
-
-    if self.selectserver and self.client:
-      self.selectserver.Execute(
-        lambda:self.client.FetchDmx(universe, recv_dmx_callback))
 
   def send_dmx(self, universe, data, callback=None):
     """Sends a full array of 512 dmx channels
