@@ -71,7 +71,7 @@ class RPiUI(App):
   def on_start(self):
     """Executed after build()"""
     self.ola_listener.start()
- 
+
   def on_stop(self):
     """Executed when the application quits"""
     self.ola_listener.stop()
@@ -101,7 +101,7 @@ class RPiUI(App):
     self.devsets.stop_ola()
 
   def display_tasks(self):
-    """Polls for events that need to update the UI, 
+    """Polls for events that need to update the UI,
        then updates the UI accordingly.
     """
     try:
@@ -115,7 +115,7 @@ class RPiUI(App):
     """Changes the UI-level selected universe.
 
        Args:
-         adapter: the adapter passed upon a listadapter on_selection_change call
+         adapter: the adapter passed on a listadapter on_selection_change call
     """
     if len(adapter.selection) == 0:
       self.devsets.selected_universe = None
@@ -123,7 +123,8 @@ class RPiUI(App):
       self.console_screen.change_selected_universe(None)
     else:
       self.devsets.selected_universe = adapter.data[adapter.selection[0].index]
-      self.monitor_screen.selected_universe = adapter.data[adapter.selection[0].index]
+      self.monitor_screen.selected_universe = \
+        adapter.data[adapter.selection[0].index]
       self.console_screen.change_selected_universe( \
         adapter.data[adapter.selection[0].index])
 

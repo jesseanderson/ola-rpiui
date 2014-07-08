@@ -16,11 +16,11 @@ class MainScreen(Screen):
 
        Args:
          ola_listener: an OLAListener object to pass tasks to
-         onchange_callback: the callback upon a selection change 
+         onchange_callback: the callback upon a selection change
                             in the main listview
 
        Attributes:
-         selected_universe: this object is changed by the parent's 
+         selected_universe: this object is changed by the parent's
                             on_change handler for the listview on this screen
     """
     super(MainScreen, self).__init__(**kwargs)
@@ -164,7 +164,7 @@ class PatchingPopup(Popup):
     """Updates the listview with available ports
 
        Args:
-         status: RequestStatus object indicating whether the 
+         status: RequestStatus object indicating whether the
                  request was successful
          devices: A list of devices
     """
@@ -216,7 +216,8 @@ class PatchingPopup(Popup):
     """Displays a success or error popup upon completion of the OLA patching
 
       Args:
-        status: RequestStatus object indicating whether the patch was successful
+        status: RequestStatus object indicating whether
+                the patch was successful
     """
     if status.Succeeded():
       info_popup = InfoPopup()

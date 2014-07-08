@@ -50,7 +50,9 @@ class ConsoleScreen(Screen):
     self.selected_universe = None
     self.ids.faders.width = 40 * _DMX_CHANNELS
     for channel_index in range(_DMX_CHANNELS):
-      channel = Fader(self.ola_listener, self.send_console_data, channel_index+1)
+      channel = Fader(self.ola_listener,
+                      self.send_console_data,
+                      channel_index+1)
       self.channels.append(channel)
       self.ids.faders.add_widget(channel)
 
