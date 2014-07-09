@@ -1,3 +1,5 @@
+"""Defines a Kivy Screen to act as a Monitor for DMX on a universe."""
+
 import math
 import kivy
 from kivy.lang import Builder

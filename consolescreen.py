@@ -1,3 +1,5 @@
+"""Defines a Kivy Screen to act as a DMX console."""
+
 import kivy
 from array import array
 from kivy.lang import Builder
@@ -5,7 +7,7 @@ from kivy.clock import Clock
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.screenmanager import Screen
 
-_DMX_CHANNELS = 512
+_DMX_CHANNELS_TO_SHOW = 512
 SEND_DATA_INTERVAL = 1
 
 Builder.load_file('consolescreen.kv')
@@ -48,8 +50,8 @@ class ConsoleScreen(Screen):
     self.on_leave = self.switch_out
     self.channels = []
     self.selected_universe = None
-    self.ids.faders.width = 40 * _DMX_CHANNELS
-    for channel_index in range(_DMX_CHANNELS):
+    self.ids.faders.width = 40 * _DMX_CHANNELS_TO_SHOW
+    for channel_index in range(_DMX_CHANNELS_TO_SHOW):
       channel = Fader(self.ola_listener,
                       self.send_console_data,
                       channel_index+1)

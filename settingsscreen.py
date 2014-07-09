@@ -1,3 +1,5 @@
+"""Defines a Kivy Screen for basic OLA settings, such as patching."""
+
 import kivy
 from kivy.lang import Builder
 from kivy.clock import Clock
