@@ -2,18 +2,19 @@
 
 <Fader>:
     size_hint: None, 1
-    width: 32
+    width: 64
     id: fader
     cols: 1
     rows: 3
     Label:
         id: channel_label
+        font_size: 24
         size_hint: 1, None
-        height: 24
+        height: 32
     Slider:
         id: channel_slider
         size_hint: None, 1
-        width: 32
+        width: 52
         orientation: 'vertical'
         step: 1
         padding: 10
@@ -21,8 +22,9 @@
         max: 255
     Label:
         id: channel_value
+        font_size: 24
         size_hint: 1, None
-        height: 24
+        height: 32
 
 <ConsoleScreen>:
     GridLayout:

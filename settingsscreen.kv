@@ -2,6 +2,7 @@
 
 <PatchingPopup>:
     title: 'Patch New Universe'
+    title_size: 24
     auto_dismiss: False
     GridLayout:
         cols: 1
@@ -10,34 +11,38 @@
             cols: 2
             rows: 1
             size_hint: 1, None
-            height: 45
+            height: 50
             Label:
                 text: 'Universe ID:'
+                font_size: 28
                 size_hint: None, None
-                height: 35
-                width: 125
+                height: 50
+                width: 200
             TextInput:
                 id: universe_id
+                font_size: 28
                 multiline: False
                 size_hint: None, None
                 height: 35
-                width: 50
+                width: 70
         GridLayout:
             cols: 2
             rows: 1
             size_hint: 1, None
-            height: 45
+            height: 50
             Label:
                 text: 'Universe Name:'
+                font_size: 28
                 size_hint: None, None
-                width: 125
-                height: 35
+                width: 200
+                height: 50
             TextInput:
                 id: universe_name
+                font_size: 28
                 multiline: False
                 size_hint: None, None
                 height: 35
-                width: 150
+                width: 300
         ListView:
             id: device_list
             size_hint: 1, 1
@@ -45,64 +50,73 @@
             cols: 2
             rows: 1
             size_hint: 1, None
-            height: 35
+            height: 70
             Button:
                 id: cancel_universe
+                font_size: 28
                 text: 'Cancel'
                 size_hint: 1, None
-                height: 35
+                height: 70
                 on_press: root.dismiss()
             Button:
                 id: patch_universe
+                font_size: 28
                 text: 'Patch Universe'
                 size_hint: 1, None
-                height: 35
+                height: 70
                 on_press: root.patch_universe()
 
 <InfoPopup>:
     size_hint: None, None
-    height: 200
-    width: 250
+    height: 400
+    width: 500
     title: 'INFO'
+    title_size: 28
     GridLayout:
         rows: 2
         cols: 1
         size_hint: 1, 1
         Label:
             id: info
+            font_size: 28
             size_hint: 1, 1
             halign: 'center'
         Button:
             size_hint: None, None
-            width: 225
-            height: 25
+            font_size: 28
+            width: 475
+            height: 50
             text: 'Close'
             on_press: root.dismiss()
 
 <ConfirmationPopup>:
     size_hint: None, None
-    height: 200
-    width: 250
+    height: 400
+    width: 500
     title: 'ALERT'
+    title_size: 28
     GridLayout:
         rows: 2
         cols: 1
         size_hint: 1, 1
         Label:
             id: confirmation
+            font_size: 28
             size_hint: 1, 1
             halign: 'center'
         GridLayout:
             rows: 1
             cols: 2
             size_hint: 1, None
-            height: 30
+            height: 60
             Button:
                 size_hint: 0.9, 0.9
+                font_size: 28
                 text: 'Cancel'
                 on_press: root.dismiss()
             Button:
                 size_hint: 0.9, 0.9
+                font_size: 28
                 id: confirmation_button
                 text: 'Confirm'
 
@@ -114,24 +128,28 @@
         size_hint: 1, 1
         Label:
             id: olad_status
+            font_size: 24
             size_hint: 1, None
-            height: 25
+            height: 35
         Label:
             text: 'Active Universes:'
+            font_size: 24
             size_hint_y: None
-            height: 25
+            height: 35
         ListView:
             id: universe_list_view
             size_hint: 0.8, 1
         Button:
             id: patch_button
+            font_size: 24
             text: 'Patch New Universe'
             size_hint: 0.8, None
-            height: 25
+            height: 45
             on_press: root.patch_popup()
         Button:
             id: unpatch_button
+            font_size: 24
             text: 'Unpatch Selected Universe'
             size_hint: 0.8, None
             on_press: root.unpatch_confirmation()
-            height: 25
+            height: 45

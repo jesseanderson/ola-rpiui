@@ -10,10 +10,12 @@
 			size: self.size
 
 <ActionBar>:
+    height: 50
     ActionView:
         id: av
         ActionButton:
             text: 'Previous screen'
+            font_size: 24
             on_release: app.go_previous_screen()
             important: True
         ActionPrevious:
@@ -21,5 +23,6 @@
             with_previous: False
         ActionButton:
             text: 'Next screen'
+            font_size: 24
             on_release: app.go_next_screen()
             important: True

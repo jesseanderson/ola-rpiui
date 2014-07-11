@@ -8,8 +8,8 @@ from kivy.uix.screenmanager import Screen
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 
-_CELL_WIDTH = 32
-_CELL_HEIGHT = 32
+_CELL_WIDTH = 64
+_CELL_HEIGHT = 64
 _DMX_CHANNELS = 512
 
 Builder.load_file('monitorscreen.kv')
