@@ -2,6 +2,7 @@
 import kivy
 kivy.require('1.8.0')
 from time import time
+from signal import signal, SIGINT
 from Queue import Queue, Empty
 from kivy.app import App
 from kivy.uix.label import Label
@@ -68,6 +69,7 @@ class RPiUI(App):
 
   def on_start(self):
     """Executed after build()"""
+    signal(SIGINT, self.stop) #Captures ctrl-c to exit correctly
     self.ola_listener.start()
  
   def on_stop(self):
