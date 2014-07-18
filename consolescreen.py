@@ -46,7 +46,7 @@ class ConsoleScreen(Screen):
   def __init__(self, ola_listener, **kwargs):
     super(ConsoleScreen, self).__init__(**kwargs)
     self.ola_listener = ola_listener
-    self.on_pre_enter = self.switch_in
+    self.on_enter = self.switch_in
     self.on_leave = self.switch_out
     self.channels = []
     self.selected_universe = None

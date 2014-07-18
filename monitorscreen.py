@@ -29,7 +29,7 @@ class MonitorScreen(Screen):
     """
     super(MonitorScreen, self).__init__(**kwargs)
     self.ola_listener = ola_listener
-    self.on_pre_enter = self.register_dmx_listener
+    self.on_enter = self.register_dmx_listener
     self.on_leave = self.unregister_dmx_listener
     self.channels = []
     self.selected_universe = None
