@@ -27,9 +27,7 @@
         cols: 1
         rows: 1
         size_hint: 1, 1
-        ScrollView:
-            StackLayout:
-                id: grid
-                size_hint: 1, None
-                height: 700
-                on_size: root.update_grid_height()
+        Carousel:
+            id: monitor_car
+            direction: 'bottom'
+            on_size: root.resize_carousel(self.size)

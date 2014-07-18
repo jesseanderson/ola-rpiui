@@ -6,6 +6,7 @@ from kivy.lang import Builder
 from kivy.properties import NumericProperty
 from kivy.uix.screenmanager import Screen
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.stacklayout import StackLayout
 from kivy.uix.label import Label
 
 _CELL_WIDTH = 32
@@ -36,7 +37,29 @@ class MonitorScreen(Screen):
       channel = MonitorCell(width=_CELL_WIDTH,height=_CELL_HEIGHT)
       channel.ids.channel.text = str(channel_index+1)
       self.channels.append(channel)
-      self.ids.grid.add_widget(channel)
+
+  def resize_carousel(self, size):
+    """The monitor screen is broken up into smaller screens that are loaded
+       individually; when the screen is resized, they update the number on
+       each screen.
+
+       Args:
+         size: [width, height] of the Carousel widget
+    """
+    width = size[0]
+    height = size[1]
+    channels_per_page = int(width / _CELL_WIDTH) * int(height / _CELL_HEIGHT)
+    pages = [self.channels[x:x+channels_per_page] for x in 
+             xrange(0, len(self.channels), channels_per_page)]
+    for slide in self.ids.monitor_car.slides:
+      slide.clear_widgets()
+    self.ids.monitor_car.clear_widgets()
+    for page in pages:
+      slide = StackLayout(size_hint_x=1, size_hint_y=1)
+      for cell in page:
+        slide.add_widget(cell)
+      self.ids.monitor_car.add_widget(slide)
+      
 
   def update_data(self, data):
     """Takes the new data and displays it in all 512 cells
