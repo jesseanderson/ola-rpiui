@@ -62,8 +62,6 @@ class ConsoleScreen(Screen):
     """To be executed when the user starts viewing the screen, this will
         schedule regular sending of DMX and start listening for dmx changes.
     """
-    self.ola_listener.start_dmx_listener(self.selected_universe.id,
-                                         self.update_data)
     Clock.schedule_interval(self.send_console_data, SEND_DATA_INTERVAL)
 
   def switch_out(self):
@@ -71,8 +69,6 @@ class ConsoleScreen(Screen):
        DMX listener and stop regular sending of DMX
     """
     Clock.unschedule(self.send_console_data)
-    self.ola_listener.stop_dmx_listener(self.selected_universe.id,
-                                        self.update_data)
 
   def change_selected_universe(self, universe):
     """Give a channel id, sends that id to all faders on the screen

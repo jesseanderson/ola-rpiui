@@ -121,7 +121,6 @@ class RPiUI(App):
     try:
       event = self.ui_queue.get(False)
       event.run()
-      self.display_tasks()
     except Empty:
       pass
 
