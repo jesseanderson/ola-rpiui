@@ -42,14 +42,18 @@ class ConsoleScreen(Screen):
 
      Args:
        ola_listener: An OLAListener object to send ola requests
+       selected_universe_service: A UniverseSelectedService object to handle
+         the user-selected universe
   """
-  def __init__(self, ola_listener, **kwargs):
+  def __init__(self, ola_listener, selected_universe_service, **kwargs):
     super(ConsoleScreen, self).__init__(**kwargs)
     self.ola_listener = ola_listener
+    self.selected_universe_service = selected_universe_service
+    self.selected_universe_service.bind( \
+      selected_universe=self.change_selected_universe)
     self.on_enter = self.switch_in
     self.on_leave = self.switch_out
     self.channels = []
-    self.selected_universe = None
     self.ids.faders.width = 40 * _DMX_CHANNELS_TO_SHOW
     for channel_index in range(_DMX_CHANNELS_TO_SHOW):
       channel = Fader(self.ola_listener,
@@ -70,21 +74,21 @@ class ConsoleScreen(Screen):
     """
     Clock.unschedule(self.send_console_data)
 
-  def change_selected_universe(self, universe):
+  def change_selected_universe(self, instance, value):
     """Give a channel id, sends that id to all faders on the screen
        and resets all faders to 0.
     """
     for channel in self.channels:
       channel.ids.channel_slider.value = 0
-      channel.selected_universe = universe
-    self.selected_universe = universe
+    print "change"
 
   def send_console_data(self, dt=0):
     """The console will send its current state to the OLA client"""
     data = []
     for channel in self.channels:
       data.append(int(channel.ids.channel_slider.value))
-    self.ola_listener.send_dmx(self.selected_universe.id, array('B', data))
+    self.ola_listener.send_dmx( \
+      self.selected_universe_service.selected_universe.id, array('B', data))
 
   def update_data(self, data):
     """The console screen must remain updated with the actual DMX data,

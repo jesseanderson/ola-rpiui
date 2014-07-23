@@ -4,10 +4,11 @@ kivy.require('1.8.0')
 from time import time
 from Queue import Queue, Empty
 from kivy.app import App
+from kivy.event import EventDispatcher
 from kivy.uix.label import Label
 from kivy.lang import Builder
 from kivy.properties import NumericProperty, StringProperty, BooleanProperty,\
-  ListProperty
+  ListProperty, ObjectProperty
 from kivy.clock import Clock
 from kivy.uix.tabbedpanel import TabbedPanel
 from kivy.uix.boxlayout import BoxLayout
@@ -44,6 +45,9 @@ class ScreenTabs(TabbedPanel):
       self.current_tab.content.on_enter()
     self.previous_tab = self.current_tab
 
+class UniverseSelectedService(EventDispatcher):
+  selected_universe = ObjectProperty(Universe(None, None, None), allownone=True)
+
 class RPiUI(App):
   """Class for drawing and handling the Kivy application itself."""
   EVENT_POLL_INTERVAL = 1 / 20
@@ -59,6 +63,7 @@ class RPiUI(App):
     self.title = 'Open Lighting Architecture'
     self.ui_queue = Queue()
     self.layout = BoxLayout(orientation='vertical')
+    self.selected_universe_service = UniverseSelectedService()
     self.ola_listener = OLAListener(self.ui_queue,
                                     self.create_select_server,
                                     self.create_ola_client,
@@ -67,11 +72,13 @@ class RPiUI(App):
     #Screen creation and layout placing
     self.screen_tabs = ScreenTabs()
     self.monitor_screen = MonitorScreen(self.ola_listener,
+                                        self.selected_universe_service,
                                         name='DMX Monitor')
     self.console_screen = ConsoleScreen(self.ola_listener,
+                                        self.selected_universe_service,
                                         name='DMX Console')
     self.devsets = MainScreen(self.ola_listener,
-                              self.change_selected_universe,
+                              self.selected_universe_service,
                               name='Device Settings')
     self.screen_tabs.ids.monitor_screen.add_widget(self.monitor_screen)
     self.screen_tabs.ids.console_screen.add_widget(self.console_screen)
@@ -123,23 +130,6 @@ class RPiUI(App):
       event.run()
     except Empty:
       pass
-
-  def change_selected_universe(self, adapter):
-    """Changes the UI-level selected universe.
-
-       Args:
-         adapter: the adapter passed on a listadapter on_selection_change call
-    """
-    if len(adapter.selection) == 0:
-      self.devsets.selected_universe = None
-      self.monitor_screen.selected_universe = None
-      self.console_screen.change_selected_universe(None)
-    else:
-      self.devsets.selected_universe = adapter.data[adapter.selection[0].index]
-      self.monitor_screen.selected_universe = \
-        adapter.data[adapter.selection[0].index]
-      self.console_screen.change_selected_universe( \
-        adapter.data[adapter.selection[0].index])
 
   def _update_clock(self, dt):
     self.time = time()

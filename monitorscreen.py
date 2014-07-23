@@ -22,17 +22,19 @@ class MonitorScreen(Screen):
   """This screen displays the values of as many DMX channels as will fit
      on the screen.
   """
-  def __init__(self, ola_listener, **kwargs):
+  def __init__(self, ola_listener, selected_universe_service, **kwargs):
     """Args:
          ola_listener: an OLAListener object with which to register
                        and unregister DMX listening.
+         selected_universe_service: a UniverseSelectedService object for managing
+                       the user-selected universe
     """
     super(MonitorScreen, self).__init__(**kwargs)
     self.ola_listener = ola_listener
+    self.selected_universe_service = selected_universe_service
     self.on_enter = self.register_dmx_listener
     self.on_leave = self.unregister_dmx_listener
     self.channels = []
-    self.selected_universe = None
     for channel_index in range(_DMX_CHANNELS):
       channel = MonitorCell(width=_CELL_WIDTH,height=_CELL_HEIGHT)
       channel.ids.channel.text = str(channel_index+1)
@@ -59,7 +61,6 @@ class MonitorScreen(Screen):
       for cell in page:
         slide.add_widget(cell)
       self.ids.monitor_car.add_widget(slide)
-      
 
   def update_data(self, data):
     """Takes the new data and displays it in all 512 cells
@@ -82,15 +83,17 @@ class MonitorScreen(Screen):
 
   def unregister_dmx_listener(self):
     """Executed when the ScreenManager switches away from the monitor screen"""
-    if self.selected_universe:
-      self.ola_listener.stop_dmx_listener(self.selected_universe.id,
-                                          None, None)
+    if self.selected_universe_service.selected_universe:
+      self.ola_listener.stop_dmx_listener( \
+        self.selected_universe_service.selected_universe.id, None, None)
 
   def register_dmx_listener(self):
     """Executed when the ScreenManager switches to the monitor screen"""
-    if self.selected_universe:
-      self.ola_listener.fetch_dmx(self.selected_universe.id,
-                                  lambda s,u,d: self.update_data(d))
-      self.ola_listener.start_dmx_listener(self.selected_universe.id,
-                                           self.update_data, None)
+    if self.selected_universe_service.selected_universe:
+      self.ola_listener.fetch_dmx( \
+        self.selected_universe_service.selected_universe.id,
+        lambda s,u,d: self.update_data(d))
+      self.ola_listener.start_dmx_listener( \
+        self.selected_universe_service.selected_universe.id,
+        self.update_data, None)
 
