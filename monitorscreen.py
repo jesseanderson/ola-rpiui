@@ -4,6 +4,7 @@ import math
 import kivy
 from kivy.lang import Builder
 from kivy.properties import NumericProperty
+from kivy.metrics import dp
 from kivy.uix.screenmanager import Screen
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.stacklayout import StackLayout
@@ -36,7 +37,7 @@ class MonitorScreen(Screen):
     self.on_leave = self.unregister_dmx_listener
     self.channels = []
     for channel_index in range(_DMX_CHANNELS):
-      channel = MonitorCell(width=_CELL_WIDTH,height=_CELL_HEIGHT)
+      channel = MonitorCell(width=dp(_CELL_WIDTH),height=dp(_CELL_HEIGHT))
       channel.ids.channel.text = str(channel_index+1)
       self.channels.append(channel)
 

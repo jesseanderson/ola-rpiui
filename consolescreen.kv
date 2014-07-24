@@ -2,27 +2,29 @@
 
 <Fader>:
     size_hint: None, 1
-    width: 32
+    width: '32dp'
     id: fader
     cols: 1
     rows: 3
     Label:
         id: channel_label
         size_hint: 1, None
-        height: 24
+        halign: 'center'
+        height: '24dp'
     Slider:
         id: channel_slider
         size_hint: None, 1
-        width: 32
+        width: '32dp'
         orientation: 'vertical'
         step: 1
-        padding: 10
+        padding: '10dp'
         min: 0
         max: 255
     Label:
         id: channel_value
         size_hint: 1, None
-        height: 24
+        halign: 'center'
+        height: '24dp'
 
 <ConsoleScreen>:
     GridLayout:
