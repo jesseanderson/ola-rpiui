@@ -5,6 +5,7 @@ from array import array
 from kivy.lang import Builder
 from kivy.clock import Clock
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.stacklayout import StackLayout
 from kivy.uix.screenmanager import Screen
 
 _DMX_CHANNELS_TO_SHOW = 512
@@ -54,13 +55,11 @@ class ConsoleScreen(Screen):
     self.on_enter = self.switch_in
     self.on_leave = self.switch_out
     self.channels = []
-    self.ids.faders.width = 40 * _DMX_CHANNELS_TO_SHOW
     for channel_index in range(_DMX_CHANNELS_TO_SHOW):
       channel = Fader(self.ola_listener,
                       self.send_console_data,
                       channel_index+1)
       self.channels.append(channel)
-      self.ids.faders.add_widget(channel)
 
   def switch_in(self):
     """To be executed when the user starts viewing the screen, this will
@@ -74,13 +73,35 @@ class ConsoleScreen(Screen):
     """
     Clock.unschedule(self.send_console_data)
 
+  def resize_carousel(self, size):
+    """The console screen is broken up into smaller screens that are placed
+       on the carousel; when the screen is resized, the number of faders on
+       each screen needs to change.
+
+       Args:
+         size: [width, height] of the new carousel widget
+    """
+    width = size[0]
+    height = size[1]
+    dummy_fader = Fader(self.ola_listener, self.send_console_data, -1)
+    channels_per_page = int(width / dummy_fader.width)
+    pages = [self.channels[x:x+channels_per_page] for x in
+             xrange(0, len(self.channels), channels_per_page)]
+    for slide in self.ids.console_car.slides:
+      slide.clear_widgets()
+    self.ids.console_car.clear_widgets()
+    for page in pages:
+      slide = StackLayout(size_hint_x=1, size_hint_y=1)
+      for cell in page:
+        slide.add_widget(cell)
+      self.ids.console_car.add_widget(slide)
+
   def change_selected_universe(self, instance, value):
     """Give a channel id, sends that id to all faders on the screen
        and resets all faders to 0.
     """
     for channel in self.channels:
       channel.ids.channel_slider.value = 0
-    print "change"
 
   def send_console_data(self, dt=0):
     """The console will send its current state to the OLA client"""
