@@ -30,7 +30,7 @@ class OLAListener(threading.Thread):
          selectserver_builder: Builds a SelectServer object for OLA tasks
          ola_client_builder: Builds the OLA Client itself
          on_start: UI Method to execute upon the starting of OLAD
-         on_stop: UI Method to execute upon the stopping of OLAD 
+         on_stop: UI Method to execute upon the stopping of OLAD
     """
     super(OLAListener,self).__init__()
     self.ui_queue = ui_queue
@@ -75,16 +75,16 @@ class OLAListener(threading.Thread):
     return lambda: task(*args)
 
   def pull_universes(self, callback):
-    """Executes the get universes request in the selectserver with a callback 
+    """Executes the get universes request in the selectserver with a callback
        that will put the universes in the UI queue
 
         Args:
-          callback: The UI callback that will be placed on the 
+          callback: The UI callback that will be placed on the
                     UI queue with the universes
     """
     self.selectserver.Execute(
       lambda: self.client.FetchUniverses(
-        lambda status, universes: 
+        lambda status, universes:
           self.ui_queue.put(UIEvent(callback, [status,universes]))))
 
 
@@ -100,13 +100,13 @@ class OLAListener(threading.Thread):
         lambda status, devices:
           self.ui_queue.put(UIEvent(callback, [status,devices]))))
 
-  def patch(self, device_alias, port, is_output, universe_id, 
+  def patch(self, device_alias, port, is_output, universe_id,
             universe_name, callback):
     """Patch a port to a universe.
 
        Args:
          device_alias: the alias of the device
-         port: the id of the port to patch to 
+         port: the id of the port to patch to
          is_output: select the input or output port
          universe_id: the universe id to patch
          universe_name: the name for this universe
@@ -121,7 +121,7 @@ class OLAListener(threading.Thread):
 
     self.selectserver.Execute(
       lambda:self.client.PatchPort(device_alias, port, is_output,
-                                   self.client.PATCH, universe_id, 
+                                   self.client.PATCH, universe_id,
                                    patch_callback(callback)))
     self.selectserver.Execute(
       lambda:self.client.SetUniverseName(universe_id, universe_name))
@@ -149,7 +149,7 @@ class OLAListener(threading.Thread):
         for port in device.input_ports:
           if port.universe == universe_id:
             self.selectserver.Execute(
-              self.create_olaclient_callback(self.client.PatchPort, 
+              self.create_olaclient_callback(self.client.PatchPort,
                                              [device.alias, port.id, False,
                                               self.client.UNPATCH, universe_id,
                                               unpatch_callback(callback)]))
@@ -179,7 +179,7 @@ class OLAListener(threading.Thread):
         lambda:self.client.FetchDmx(universe, \
           lambda s,u,d: self.ui_queue.put(UIEvent(callback,[s,u,d]))))
 
-  def start_dmx_listener(self, universe, data_callback, callback):
+  def start_dmx_listener(self, universe, data_callback, callback=None):
     """Starts a listener that will call data_callback every time
        there is new DMX data.
 
@@ -194,7 +194,7 @@ class OLAListener(threading.Thread):
           lambda data: self.ui_queue.put(UIEvent(data_callback,[data])),
           lambda status: self.ui_queue.put(UIEvent(callback,[status]))))
 
-  def stop_dmx_listener(self, universe, data_callback, callback):
+  def stop_dmx_listener(self, universe, data_callback, callback=None):
     """Stops listening for DMX updates to universe.
 
        Args:
@@ -206,4 +206,17 @@ class OLAListener(threading.Thread):
       self.selectserver.Execute(
         lambda:self.client.RegisterUniverse(universe, self.client.UNREGISTER, \
           lambda data: self.ui_queue.put(UIEvent(data_callback,[data])),
+          lambda status: self.ui_queue.put(UIEvent(callback,[status]))))
+
+  def send_dmx(self, universe, data, callback=None):
+    """Sends a full array of 512 dmx channels
+
+       Args:
+         universe: the universe to send dmx to
+         data: an array of size 512 containing data for all channels to be sent
+         callback: the callback after the data is sent.
+    """
+    if self.selectserver and self.client:
+      self.selectserver.Execute(
+        lambda:self.client.SendDmx(universe, data, \
           lambda status: self.ui_queue.put(UIEvent(callback,[status]))))

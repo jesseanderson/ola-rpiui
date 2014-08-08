@@ -1,0 +1,35 @@
+#:kivy 1.8.0
+
+<Fader>:
+    size_hint: None, 1
+    width: 32
+    id: fader
+    cols: 1
+    rows: 3
+    Label:
+        id: channel_label
+        size_hint: 1, None
+        height: 24
+    Slider:
+        id: channel_slider
+        size_hint: None, 1
+        width: 32
+        orientation: 'vertical'
+        step: 1
+        padding: 10
+        min: 0
+        max: 255
+    Label:
+        id: channel_value
+        size_hint: 1, None
+        height: 24
+
+<ConsoleScreen>:
+    GridLayout:
+        id: console
+        cols: 1
+        rows: 1
+        size_hint: 1, 1
+        Carousel:
+            id: console_car
+            on_size: root.resize_carousel(self.size)

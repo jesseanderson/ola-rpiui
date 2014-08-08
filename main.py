@@ -51,12 +51,14 @@ class RPiUI(App):
     self.sm = ScreenManager(transition=SlideTransition())
     self.monitor_screen = MonitorScreen(self.ola_listener,
                                         name='DMX Monitor')
+    self.console_screen = ConsoleScreen(self.ola_listener,
+                                        name='DMX Console')
     self.devsets = MainScreen(self.ola_listener,
                               self.change_selected_universe,
                               name='Device Settings')
     self.sm.add_widget(self.devsets)
     self.sm.add_widget(self.monitor_screen)
-    self.sm.add_widget(ConsoleScreen(name='DMX Console'))
+    self.sm.add_widget(self.console_screen)
     self.layout.add_widget(self.sm)
     self.screens = {}
     self.available_screens = ['Device Settings','DMX Monitor','DMX Console']
@@ -71,7 +73,7 @@ class RPiUI(App):
     """Executed after build()"""
     signal(SIGINT, self.stop) #Captures ctrl-c to exit correctly
     self.ola_listener.start()
- 
+
   def on_stop(self):
     """Executed when the application quits"""
     self.ola_listener.stop()
@@ -101,7 +103,7 @@ class RPiUI(App):
     self.devsets.stop_ola()
 
   def display_tasks(self):
-    """Polls for events that need to update the UI, 
+    """Polls for events that need to update the UI,
        then updates the UI accordingly.
     """
     try:
@@ -115,15 +117,18 @@ class RPiUI(App):
     """Changes the UI-level selected universe.
 
        Args:
-         adapter: the adapter passed upon a listadapter on_selection_change call
+         adapter: the adapter passed on a listadapter on_selection_change call
     """
     if len(adapter.selection) == 0:
       self.devsets.selected_universe = None
       self.monitor_screen.selected_universe = None
+      self.console_screen.change_selected_universe(None)
     else:
       self.devsets.selected_universe = adapter.data[adapter.selection[0].index]
-      self.monitor_screen.selected_universe = adapter.data[adapter.selection[0].index]
-
+      self.monitor_screen.selected_universe = \
+        adapter.data[adapter.selection[0].index]
+      self.console_screen.change_selected_universe( \
+        adapter.data[adapter.selection[0].index])
 
   def go_previous_screen(self):
     """Changes the UI to view the screen to the left of the current one"""

@@ -1,3 +1,5 @@
+"""Defines a Kivy Screen to act as a Monitor for DMX on a universe."""
+
 import math
 import kivy
 from kivy.lang import Builder
@@ -52,13 +54,14 @@ class MonitorScreen(Screen):
     """The grid height must be as high as its last visible child in order
        for the ScrollView to work as intended.
     """
-    self.ids.grid.height = _CELL_HEIGHT * math.ceil(float(_DMX_CHANNELS) / 
+    self.ids.grid.height = _CELL_HEIGHT * math.ceil(float(_DMX_CHANNELS) /
                              (self.ids.monitor.width / _CELL_WIDTH))
 
   def unregister_dmx_listener(self):
     """Executed when the ScreenManager switches away from the monitor screen"""
     if self.selected_universe:
-      self.ola_listener.stop_dmx_listener(self.selected_universe.id, None, None)
+      self.ola_listener.stop_dmx_listener(self.selected_universe.id,
+                                          None, None)
 
   def register_dmx_listener(self):
     """Executed when the ScreenManager switches to the monitor screen"""

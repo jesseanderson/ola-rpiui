@@ -32,7 +32,7 @@ class TestUIEvent(unittest.TestCase):
     self.assertIs(self._args, ())
 
   def test_args_list(self):
-    """Tests to ensure that when args are provided with a function, 
+    """Tests to ensure that when args are provided with a function,
        the function is executed correctly with those args.
     """
     test_args = [1, 'hello', 2]
@@ -89,7 +89,7 @@ class MockOlaClient(OlaClient):
   def PluginDescription(self, callback, plugin_id):
     callback(None, "Test Plugin Description")
   def FetchDevices(self, callback):
-    callback(None, [Device(123, 1, "Test Device", None, 
+    callback(None, [Device(123, 1, "Test Device", None,
                           [Port(1, 50, True, "", False)], [])])
   def FetchUniverses(self, callback):
     callback(None, [Universe(123, "Test Universe", Universe.LTP)])
@@ -181,7 +181,7 @@ class TestOLAListener(unittest.TestCase):
     self.ola_listener.pull_universes(callback)
     self.clear_ui_queue()
     self.assertTrue(self.callback_executed)
- 
+
   def test_pull_devices(self):
     """Tests the OLAListener's pull_devices method"""
     self.callback_executed = False
@@ -241,5 +241,14 @@ class TestOLAListener(unittest.TestCase):
     def callback(status):
       self.callback_executed = True
     self.ola_listener.stop_dmx_listener(1, None, callback)
+    self.clear_ui_queue()
+    self.assertTrue(self.callback_executed)
+
+  def test_send_dmx(self):
+    """Tests the OLAListener's stop_dmx method"""
+    self.callback_executed = False
+    def callback(status):
+      self.callback_executed = True
+    self.ola_listener.send_dmx(1, [0, 1, 2, 3], callback)
     self.clear_ui_queue()
     self.assertTrue(self.callback_executed)
