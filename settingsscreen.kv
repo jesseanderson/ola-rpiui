@@ -10,34 +10,34 @@
             cols: 2
             rows: 1
             size_hint: 1, None
-            height: 45
+            height: '45dp'
             Label:
                 text: 'Universe ID:'
                 size_hint: None, None
-                height: 35
-                width: 125
+                height: '35dp'
+                width: '125dp'
             TextInput:
                 id: universe_id
                 multiline: False
                 size_hint: None, None
-                height: 35
-                width: 50
+                height: '35dp'
+                width: '50dp'
         GridLayout:
             cols: 2
             rows: 1
             size_hint: 1, None
-            height: 45
+            height: '45dp'
             Label:
                 text: 'Universe Name:'
                 size_hint: None, None
-                width: 125
-                height: 35
+                width: '125dp'
+                height: '35dp'
             TextInput:
                 id: universe_name
                 multiline: False
                 size_hint: None, None
-                height: 35
-                width: 150
+                height: '35dp'
+                width: '150dp'
         ListView:
             id: device_list
             size_hint: 1, 1
@@ -45,24 +45,24 @@
             cols: 2
             rows: 1
             size_hint: 1, None
-            height: 35
+            height: '35dp'
             Button:
                 id: cancel_universe
                 text: 'Cancel'
                 size_hint: 1, None
-                height: 35
+                height: '35dp'
                 on_press: root.dismiss()
             Button:
                 id: patch_universe
                 text: 'Patch Universe'
                 size_hint: 1, None
-                height: 35
+                height: '35dp'
                 on_press: root.patch_universe()
 
 <InfoPopup>:
     size_hint: None, None
-    height: 200
-    width: 250
+    height: '200dp'
+    width: '250dp'
     title: 'INFO'
     GridLayout:
         rows: 2
@@ -73,16 +73,15 @@
             size_hint: 1, 1
             halign: 'center'
         Button:
-            size_hint: None, None
-            width: 225
-            height: 25
+            size_hint: 1, None
+            height: '25dp'
             text: 'Close'
             on_press: root.dismiss()
 
 <ConfirmationPopup>:
     size_hint: None, None
-    height: 200
-    width: 250
+    height: '200dp'
+    width: '250dp'
     title: 'ALERT'
     GridLayout:
         rows: 2
@@ -96,7 +95,7 @@
             rows: 1
             cols: 2
             size_hint: 1, None
-            height: 30
+            height: '30dp'
             Button:
                 size_hint: 0.9, 0.9
                 text: 'Cancel'
@@ -115,11 +114,11 @@
         Label:
             id: olad_status
             size_hint: 1, None
-            height: 25
+            height: '25dp'
         Label:
             text: 'Active Universes:'
             size_hint_y: None
-            height: 25
+            height: '25dp'
         ListView:
             id: universe_list_view
             size_hint: 0.8, 1
@@ -127,11 +126,11 @@
             id: patch_button
             text: 'Patch New Universe'
             size_hint: 0.8, None
-            height: 25
+            height: '25dp'
             on_press: root.patch_popup()
         Button:
             id: unpatch_button
             text: 'Unpatch Selected Universe'
             size_hint: 0.8, None
             on_press: root.unpatch_confirmation()
-            height: 25
+            height: '25dp'

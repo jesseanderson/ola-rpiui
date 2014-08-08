@@ -27,7 +27,7 @@ class MainScreen(Screen):
     universe_converter = \
       lambda row_index, selectable: {'text': selectable.name,
                                      'size_hint_y': None,
-                                     'height': 25}
+                                     'height': '25dp'}
     list_adapter = ListAdapter(data=[],
                                args_converter=universe_converter,
                                selection_mode='single',
@@ -162,7 +162,7 @@ class PatchingPopup(Popup):
                                                            selectable[1],
                                                            selectable[3]),
                                      'size_hint_y': None,
-                                     'height': 25}
+                                     'height': '25dp'}
     port_adapter = ListAdapter(data=[],
                                args_converter=port_converter,
                                selection_mode='multiple',
