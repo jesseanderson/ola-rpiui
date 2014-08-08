@@ -5,12 +5,13 @@ from time import time
 from signal import signal, SIGINT
 from Queue import Queue, Empty
 from kivy.app import App
+from kivy.event import EventDispatcher
 from kivy.uix.label import Label
 from kivy.lang import Builder
 from kivy.properties import NumericProperty, StringProperty, BooleanProperty,\
-  ListProperty
+  ListProperty, ObjectProperty
 from kivy.clock import Clock
-from kivy.uix.screenmanager import ScreenManager, Screen, SlideTransition
+from kivy.uix.tabbedpanel import TabbedPanel
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.actionbar import ActionBar
 from kivy.uix.button import Button
@@ -24,6 +25,29 @@ from monitorscreen import MonitorScreen
 from consolescreen import ConsoleScreen
 from ola.OlaClient import OlaClient, Universe
 from ola.ClientWrapper import SelectServer
+
+class ScreenTabs(TabbedPanel):
+  """Class for the widget that holds all the Screens in a tabbed view"""
+
+  def __init__(self, **kwargs):
+    super(ScreenTabs, self).__init__(**kwargs)
+    self.previous_tab = self.current_tab
+
+  def on_size(self, inst, value):
+    """Ensures that the tabs fill the entire top bar"""
+    width = value[0]
+    self.tab_width = int(width / len(self.tab_list))
+
+  def on_current_tab(self, *args):
+    """When the current tab changes, fire Screen methods for enter/exit"""
+    if self.previous_tab.content:
+      self.previous_tab.content.on_leave()
+    if self.current_tab.content:
+      self.current_tab.content.on_enter()
+    self.previous_tab = self.current_tab
+
+class UniverseSelectedService(EventDispatcher):
+  selected_universe = ObjectProperty(Universe(None, None, None), allownone=True)
 
 class RPiUI(App):
   """Class for drawing and handling the Kivy application itself."""
@@ -40,30 +64,27 @@ class RPiUI(App):
     self.title = 'Open Lighting Architecture'
     self.ui_queue = Queue()
     self.layout = BoxLayout(orientation='vertical')
+    self.selected_universe_service = UniverseSelectedService()
     self.ola_listener = OLAListener(self.ui_queue,
                                     self.create_select_server,
                                     self.create_ola_client,
                                     self.start_ola,
                                     self.stop_ola)
-    self.ab = ActionBar()
-    self.layout.add_widget(self.ab)
     #Screen creation and layout placing
-    self.sm = ScreenManager(transition=SlideTransition())
+    self.screen_tabs = ScreenTabs()
     self.monitor_screen = MonitorScreen(self.ola_listener,
+                                        self.selected_universe_service,
                                         name='DMX Monitor')
     self.console_screen = ConsoleScreen(self.ola_listener,
+                                        self.selected_universe_service,
                                         name='DMX Console')
     self.devsets = MainScreen(self.ola_listener,
-                              self.change_selected_universe,
+                              self.selected_universe_service,
                               name='Device Settings')
-    self.sm.add_widget(self.devsets)
-    self.sm.add_widget(self.monitor_screen)
-    self.sm.add_widget(self.console_screen)
-    self.layout.add_widget(self.sm)
-    self.screens = {}
-    self.available_screens = ['Device Settings','DMX Monitor','DMX Console']
-    self.screen_names = self.available_screens
-    self.go_next_screen()
+    self.screen_tabs.ids.monitor_screen.add_widget(self.monitor_screen)
+    self.screen_tabs.ids.console_screen.add_widget(self.console_screen)
+    self.screen_tabs.ids.settings_screen.add_widget(self.devsets)
+    self.layout.add_widget(self.screen_tabs)
     Clock.schedule_interval(lambda dt: self.display_tasks(),
                             self.EVENT_POLL_INTERVAL)
     Clock.schedule_interval(self._update_clock, 1 / 60.)
@@ -109,40 +130,8 @@ class RPiUI(App):
     try:
       event = self.ui_queue.get(False)
       event.run()
-      self.display_tasks()
     except Empty:
       pass
-
-  def change_selected_universe(self, adapter):
-    """Changes the UI-level selected universe.
-
-       Args:
-         adapter: the adapter passed on a listadapter on_selection_change call
-    """
-    if len(adapter.selection) == 0:
-      self.devsets.selected_universe = None
-      self.monitor_screen.selected_universe = None
-      self.console_screen.change_selected_universe(None)
-    else:
-      self.devsets.selected_universe = adapter.data[adapter.selection[0].index]
-      self.monitor_screen.selected_universe = \
-        adapter.data[adapter.selection[0].index]
-      self.console_screen.change_selected_universe( \
-        adapter.data[adapter.selection[0].index])
-
-  def go_previous_screen(self):
-    """Changes the UI to view the screen to the left of the current one"""
-    self.index = (self.index - 1) % len(self.available_screens)
-    SlideTransition.direction = 'right'
-    self.sm.current = self.screen_names[self.index]
-    self.current_title = self.screen_names[self.index]
-
-  def go_next_screen(self):
-    """Changes the UI to view the screen to the right of the current one"""
-    self.index = (self.index + 1) % len(self.available_screens)
-    SlideTransition.direction = 'left'
-    self.sm.current = self.screen_names[self.index]
-    self.current_title = self.screen_names[self.index]
 
   def _update_clock(self, dt):
     self.time = time()

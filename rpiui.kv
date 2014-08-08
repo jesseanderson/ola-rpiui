@@ -9,17 +9,16 @@
 		Rectangle:
 			size: self.size
 
-<ActionBar>:
-    ActionView:
-        id: av
-        ActionButton:
-            text: 'Previous screen'
-            on_release: app.go_previous_screen()
-            important: True
-        ActionPrevious:
-            disabled: True
-            with_previous: False
-        ActionButton:
-            text: 'Next screen'
-            on_release: app.go_next_screen()
-            important: True
+<ScreenTabs>:
+    size_hint: 1, 1
+    do_default_tab: False
+    tab_pos: 'top_mid'
+    TabbedPanelItem:
+        id: settings_screen
+        text: 'Settings'
+    TabbedPanelItem:
+        id: monitor_screen
+        text: 'DMX Monitor'
+    TabbedPanelItem:
+        id: console_screen
+        text: 'DMX Console'

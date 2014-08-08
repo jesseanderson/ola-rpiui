@@ -13,21 +13,17 @@ Builder.load_file('settingsscreen.kv')
 class MainScreen(Screen):
   """The settings screen that the app opens to"""
 
-  def __init__(self, ola_listener, onchange_callback, **kwargs):
+  def __init__(self, ola_listener, selected_universe_service, **kwargs):
     """Initializes the listview that contains the universe selection.
 
        Args:
          ola_listener: an OLAListener object to pass tasks to
-         onchange_callback: the callback upon a selection change
-                            in the main listview
-
-       Attributes:
-         selected_universe: this object is changed by the parent's
-                            on_change handler for the listview on this screen
+         selected_universe_service: this UniverseSelectedService object manages 
+           the universe selected by the user.
     """
     super(MainScreen, self).__init__(**kwargs)
     self.ola_listener = ola_listener
-    self.selected_universe = None
+    self.selected_universe_service = selected_universe_service
     universe_converter = \
       lambda row_index, selectable: {'text': selectable.name,
                                      'size_hint_y': None,
@@ -37,7 +33,7 @@ class MainScreen(Screen):
                                selection_mode='single',
                                allow_empty_selection=False,
                                cls=ListItemButton)
-    list_adapter.bind(on_selection_change=onchange_callback)
+    list_adapter.bind(on_selection_change=self.change_selected_universe)
     self.ids.universe_list_view.adapter = list_adapter
 
   def start_ola(self, universe_poll_interval):
@@ -61,6 +57,19 @@ class MainScreen(Screen):
     self.ids.universe_list_view.disabled = True
     self.ids.patch_button.disabled = True
     self.ids.unpatch_button.disabled = True
+
+  def change_selected_universe(self, adapter):
+    """Changes the selected universe, as this is a property, it
+       can propagate to other screens that need it.
+
+       Args:
+         adapter: the adapter passed on a listapter on_selection_change call
+    """
+    if len(adapter.selection) == 0:
+      self.selected_universe_service.selected_universe = None
+    else:
+      self.selected_universe_service.selected_universe = \
+        adapter.data[adapter.selection[0].index]
 
   def display_universes(self, dt):
     """Makes a call to fetch the active universes; then put them in the

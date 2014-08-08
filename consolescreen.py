@@ -43,14 +43,18 @@ class ConsoleScreen(Screen):
 
      Args:
        ola_listener: An OLAListener object to send ola requests
+       selected_universe_service: A UniverseSelectedService object to handle
+         the user-selected universe
   """
-  def __init__(self, ola_listener, **kwargs):
+  def __init__(self, ola_listener, selected_universe_service, **kwargs):
     super(ConsoleScreen, self).__init__(**kwargs)
     self.ola_listener = ola_listener
-    self.on_pre_enter = self.switch_in
+    self.selected_universe_service = selected_universe_service
+    self.selected_universe_service.bind( \
+      selected_universe=self.change_selected_universe)
+    self.on_enter = self.switch_in
     self.on_leave = self.switch_out
     self.channels = []
-    self.selected_universe = None
     for channel_index in range(_DMX_CHANNELS_TO_SHOW):
       channel = Fader(self.ola_listener,
                       self.send_console_data,
@@ -61,8 +65,6 @@ class ConsoleScreen(Screen):
     """To be executed when the user starts viewing the screen, this will
         schedule regular sending of DMX and start listening for dmx changes.
     """
-    self.ola_listener.start_dmx_listener(self.selected_universe.id,
-                                         self.update_data)
     Clock.schedule_interval(self.send_console_data, SEND_DATA_INTERVAL)
 
   def switch_out(self):
@@ -70,8 +72,6 @@ class ConsoleScreen(Screen):
        DMX listener and stop regular sending of DMX
     """
     Clock.unschedule(self.send_console_data)
-    self.ola_listener.stop_dmx_listener(self.selected_universe.id,
-                                        self.update_data)
 
   def resize_carousel(self, size):
     """The console screen is broken up into smaller screens that are placed
@@ -96,21 +96,20 @@ class ConsoleScreen(Screen):
         slide.add_widget(cell)
       self.ids.console_car.add_widget(slide)
 
-  def change_selected_universe(self, universe):
+  def change_selected_universe(self, instance, value):
     """Give a channel id, sends that id to all faders on the screen
        and resets all faders to 0.
     """
     for channel in self.channels:
       channel.ids.channel_slider.value = 0
-      channel.selected_universe = universe
-    self.selected_universe = universe
 
   def send_console_data(self, dt=0):
     """The console will send its current state to the OLA client"""
     data = []
     for channel in self.channels:
       data.append(int(channel.ids.channel_slider.value))
-    self.ola_listener.send_dmx(self.selected_universe.id, array('B', data))
+    self.ola_listener.send_dmx( \
+      self.selected_universe_service.selected_universe.id, array('B', data))
 
   def update_data(self, data):
     """The console screen must remain updated with the actual DMX data,
