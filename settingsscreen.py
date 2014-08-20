@@ -114,8 +114,9 @@ class MainScreen(Screen):
     """
     def unpatch_universe():
       """Makes the unpatching call to the olalistener"""
-      self.ola_listener.unpatch(self.selected_universe.id,
-                                self.unpatch_callback_popup(popup))
+      self.ola_listener.unpatch(
+        self.selected_universe_service.selected_universe.id,
+        self.unpatch_callback_popup(popup))
     return unpatch_universe
 
   def unpatch_callback_popup(self, popup):
